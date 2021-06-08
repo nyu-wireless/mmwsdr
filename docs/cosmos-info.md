@@ -30,7 +30,5 @@
 ## More Information
 The above information has been collected from the COSMOS wiki pages. Please refer to them for more information
 and examples.
-* [COSMOS Wiki - Sandbox 1](https://wiki.cosmos-lab.org/wiki/Architecture/Domains/cosmos_sb1]
-)
-* [COSMOS Wiki - XY Table](https://wiki.cosmos-lab.org/wiki/Resources/Services/XYTable]
-[a])
+* [COSMOS Wiki - Sandbox 1](https://wiki.cosmos-lab.org/wiki/Architecture/Domains/cosmos_sb1)
+* [COSMOS Wiki - XY Table](https://wiki.cosmos-lab.org/wiki/Resources/Services/XYTable)
