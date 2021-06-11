@@ -132,13 +132,13 @@ classdef RFSoC < matlab.System
             write(obj.sockData, sprintf("WriteDataToMemory 0 0 %d 0\r\n", 2*nsamp));
             write(obj.sockData, txtd, 'int16');
             pause(0.1);
-            
+
             % Read response from the Data TCP Socket
             rsp = read(obj.sockData);
             if (obj.isDebug)
                 fprintf(1, "%s", rsp);
             end
-            
+
             obj.sendCmd("LocalMemTrigger 1 2 0 0x0001");
         end
         
