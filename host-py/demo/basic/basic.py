@@ -20,8 +20,8 @@ def main():
     is_debug = True
 
     # Create the two SDRs
-    sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.115.1.3', unit_name='SN0243', is_debug=is_debug)
-    sdr1 = mmwsdr.sdr.Sivers60GHz(ip='10.115.1.4', unit_name='SN0240', is_debug=is_debug)
+    sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.115.6.3', unit_name='SN0243', is_debug=is_debug)
+    sdr1 = mmwsdr.sdr.Sivers60GHz(ip='10.115.6.4', unit_name='SN0240', is_debug=is_debug)
 
     # Configure the RFSoC
     sdr0.fpga.configure('../../config/rfsoc.cfg')

@@ -15,12 +15,17 @@ the docs.
 
 @copyright 2021
 """
-import eder
+import os
+import sys
 import time
 import mmwsdr
 import socket
 import numpy as np
 
+path = os.path.abspath('../../../../ederenv/Eder_A/')
+if not path in sys.path:
+    sys.path.append(path)
+import eder
 
 class Sivers60GHz(object):
     """
@@ -29,18 +34,19 @@ class Sivers60GHz(object):
 
     """
 
-    def __init__(self, ip='10.115.1.3', freq=60.48e9, unit_name='SN0240', board_type='MB1', is_debug=False):
+    def __init__(self, ip='10.115.1.3', freq=60.48e9, unit_name='SN0240', board_type='MB1', eder_version=2, is_debug=False):
         self.ip = ip
         self.fc = freq
         self.is_debug = is_debug
+        self.sock = None
 
         # Establish connection with the COSMOS TCP Server.
         self.__connect()
 
         # Create the FPGA and the Array object
         self.fpga = mmwsdr.fpga.RFSoC(ip=ip, is_debug=is_debug)
-        self.array = eder.Eder(init=True, unit_name=unit_name, board_type=board_type)
-        assert self.array.check(), "Error: Chip not present"
+        self.array = eder.Eder(init=True, unit_name=unit_name, board_type=board_type, eder_version=eder_version)
+        self.array.check()
 
         # Initialize the beamforming vectors
         self.rx_bf = 0

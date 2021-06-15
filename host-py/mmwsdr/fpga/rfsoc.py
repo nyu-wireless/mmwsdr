@@ -107,7 +107,7 @@ class RFSoC(object):
         """
         # Check if the file exists
         if not os.path.isfile(file):
-            print(f'File {file} does not exist')
+            print('File %s does not exist'%(file))
             return
 
         with open(file, 'r') as fid:
