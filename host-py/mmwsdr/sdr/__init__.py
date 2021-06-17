@@ -2,4 +2,4 @@
 """
 
 """
-from sivers import Sivers60GHz
+from mmwsdr.sdr.sivers import Sivers60GHz

@@ -2,4 +2,4 @@
 """
 
 """
-from rfsoc import RFSoC
+from mmwsdr.fpga.rfsoc import RFSoC

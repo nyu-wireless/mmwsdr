@@ -34,7 +34,7 @@ class Sivers60GHz(object):
 
     """
 
-    def __init__(self, ip='10.115.1.3', freq=60.48e9, unit_name='SN0240', board_type='MB1', eder_version=2, is_debug=False):
+    def __init__(self, ip='10.115.1.3', freq=60.48e9, unit_name='SN0240', board_type='MB1', eder_version='2', is_debug=False):
         self.ip = ip
         self.fc = freq
         self.is_debug = is_debug
@@ -49,12 +49,12 @@ class Sivers60GHz(object):
         self.array.check()
 
         # Initialize the beamforming vectors
-        self.rx_bf = 0
-        self.tx_bf = 0
+        self.beam_index = 0
 
     def __del__(self):
         self.__disconnect()
-        del self.fpga, self.array
+        del self.fpga
+        del self.array
 
     def __connect(self):
         self.sock = socket.create_connection((self.ip, 8083))
@@ -111,23 +111,22 @@ class Sivers60GHz(object):
             raise NotImplemented
 
     @property
-    def rx_bf(self):
+    def beam_index(self):
         """
-        Set the receive (RX) beamforming (BF) vector.
+        Set the SDR beamforming (BF) direction
 
         Parameters
         ----------
         None
 
         Returns
-        -------
-        __rx_bf : int
-            Index of the RX BF vector (row of the RX BF AWV Table)
+        beam_index : int
+            Index of the RX or TX BF vector (row of the RX BF AWV Table)
         """
-        return self.__rx_bf
+        return self.__beam_index
 
-    @rx_bf.setter
-    def rx_bf(self, beam_idx):
+    @beam_index.setter
+    def beam_index(self, index):
         """
         Set the receive (RX) beamforming (BF) vector.
 
@@ -140,72 +139,8 @@ class Sivers60GHz(object):
         -------
         None
         """
-        self.array.rx.set_beam(beam_idx)
-        self.__rx_bf = beam_idx
+        self.array.tx.set_beam(index)
+        self.array.rx.set_beam(index)
+        self.__beam_index = index
 
-    @property
-    def tx_bf(self):
-        """
-        Set the transmit (TX) beamforming (BF) vector.
 
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        __tx_bf : int
-            Index of the TX BF vector (row of the TX BF AWV Table)
-        """
-        return self.__tx_bf
-
-    @tx_bf.setter
-    def tx_bf(self, beam_idx):
-        """
-        Set the transmit (TX) beamforming (BF) vector.
-
-        Parameters
-        ----------
-        beam_idx : int
-            Index of the TX BF vector (row of the TX BF AWV Table)
-
-        Returns
-        -------
-        None
-        """
-        self.array.tx.set_beam(beam_idx)
-        self.__tx_bf = beam_idx
-
-    @property
-    def rx_gain(self, stage=None):
-        """
-        Get the receive (RX) radio frequency front-end (RFFE) gain
-
-        Parameters
-        ----------
-        stage : string
-            Select the RFFE stage of the RX to read
-
-        Returns
-        -------
-        gain : list
-            Gain of a specific RFFE stage
-        """
-        return self.array.rx.gain_get(stage=stage)
-
-    @property
-    def tx_gain(self, stage=None):
-        """
-        Get the transmit (TX) radio frequency front-end (RFFE) gain
-
-        Parameters
-        ----------
-        stage : string
-            Select the RFFE stage of the TX to read
-
-        Returns
-        -------
-        gain : list
-            Gain of a specific RFFE stage
-        """
-        return self.array.tx.gain_get(stage=stage)
