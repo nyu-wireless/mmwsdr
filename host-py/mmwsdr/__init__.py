@@ -2,5 +2,5 @@
 """
 
 """
-import fpga
-import sdr
+import mmwsdr.fpga
+import mmwsdr.sdr

@@ -43,6 +43,10 @@ class RFSoC(object):
     @property
     def nch(self):
         return self.__nch
+    
+    @property
+    def npar(self):
+        return self.__npar
 
     def __init__(self, ip='10.113.1.3', is_debug=False):
         """
