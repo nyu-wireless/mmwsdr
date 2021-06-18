@@ -11,6 +11,8 @@ the XYTable/s of the COSMOS Testbed
 @copyright 2021
 """
 import requests
+import xmltodict
+import json
 
 
 class XYTable(object):
@@ -18,14 +20,61 @@ class XYTable(object):
     XY Table class
     """
     def __init__(self, table_name):
-        self.table_name = table_name  # either xytable1 or xytable2 (enum)
+        self.table = table_name  # either xytable1 or xytable2
+        self.main_url = 'https://am1.cosmos-lab.org:5054/xy_table/'
 
     def __del__(self):
+        del self.table
+        del self.main_url
+
+    @property
+    def table(self):
+        return self.__table
+
+    @table.setter
+    def table(self, table_name):
+        if table_name == 'xytable1' or table_name == 'xytable2':
+            self.__table = table_name
+        else:
+            raise NotImplemented
+
+    @table.deleter
+    def table(self):
+        del self.table
 
     def get_status(self):
+        params = {'name': self.table + '.sb1.cosmos-lab.org'}
+        try:
+            r = requests.get(url=self.main_url + 'status', params=params)
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            raise SystemExit(err)
+        else:
+            # Success: print status of the xytable
+            json_data = json.dumps(xmltodict.parse(r.content))
 
-    def move(self):
+    def move(self, x, y, angle):
+        # TODO: check that x,y, angle are valid inputs according to Cosmos specs
+        params = {'name': self.table + '.sb1.cosmos-lab.org',
+                  'x': x,
+                  'y': y,
+                  'angle': angle}
+        try:
+            r = requests.get(url=self.main_url + 'move_to', params=params)
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            raise SystemExit(err)
+        else:
+            # Success: print new position of the xytable
+            json_data = json.dumps(xmltodict.parse(r.content))
 
     def stop(self):
-
-
+        params = {'name': self.table + '.sb1.cosmos-lab.org'}
+        try:
+            r = requests.get(url=self.main_url + 'stop', params=params)
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            raise SystemExit(err)
+        else:
+            # Success: print the current stop position of the xytable
+            json_data = json.dumps(xmltodict.parse(r.content))
