@@ -20,18 +20,16 @@ import sys
 import time
 import mmwsdr
 import socket
-import numpy as np
+import eder
 
 path = os.path.abspath('../../../../ederenv/Eder_A/')
-if not path in sys.path:
+if path not in sys.path:
     sys.path.append(path)
-import eder
+
 
 class Sivers60GHz(object):
     """
     Sivers60GHz class
-    ---
-
     """
 
     def __init__(self, ip='10.115.1.3', freq=60.48e9, unit_name='SN0240', board_type='MB1', eder_version='2', is_debug=False):
@@ -48,7 +46,7 @@ class Sivers60GHz(object):
         self.array = eder.Eder(init=True, unit_name=unit_name, board_type=board_type, eder_version=eder_version)
         self.array.check()
 
-        # Initialize the beamforming vectors
+        # Initialize the beam-forming vectors
         self.beam_index = 0
 
     def __del__(self):
@@ -79,7 +77,7 @@ class Sivers60GHz(object):
         self.sock.sendall(b'+ %d %d %d' % (nread / self.fpga.npar, nskip / self.fpga.npar, nsamp * 2))
 
         rxtd = self.fpga.recv(nsamp)
-        rxtd = rxtd.reshape(nread,nbatch)
+        rxtd = rxtd.reshape(nread, nbatch)
         return rxtd
 
     @property
@@ -115,11 +113,8 @@ class Sivers60GHz(object):
         """
         Set the SDR beamforming (BF) direction
 
-        Parameters
-        ----------
-        None
-
         Returns
+        ----------
         beam_index : int
             Index of the RX or TX BF vector (row of the RX BF AWV Table)
         """
@@ -132,7 +127,7 @@ class Sivers60GHz(object):
 
         Parameters
         ----------
-        beam_idx : int
+        index : int
             Index of the RX BF vector (row of the RX BF AWV Table)
 
         Returns
