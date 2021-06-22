@@ -1,3 +1,6 @@
 [submodule "fpga"]
 	path = fpga
 	url = https://github.com/nyu-wireless/mmwsdr-fpga.git
+[submodule "lib"]
+	path = lib
+	url = https://github.com/nyu-wireless/mmwsdr-lib
