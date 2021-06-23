@@ -131,10 +131,10 @@ class RFSoC(object):
 
         time.sleep(0.1)
         tmp = self.sock_data.recv(nbytes)
-        data = np.array([it for it in struct.iter_unpack('<h', tmp)], dtype='int16').flatten()
+        data = np.array([it for it in struct.unpack('<h', tmp)], dtype='int16').flatten()
         while data.nbytes < nbytes:
             tmp = self.sock_data.recv(nbytes - data.nbytes)
-            tmp = np.array([it for it in struct.iter_unpack('<h', tmp)], dtype='int16').flatten()
+            tmp = np.array([it for it in struct.unpack('<h', tmp)], dtype='int16').flatten()
             data = np.append(data, tmp)
 
         rsp = self.sock_data.recv(32768)
