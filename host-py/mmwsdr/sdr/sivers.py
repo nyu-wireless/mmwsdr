@@ -20,12 +20,11 @@ import sys
 import time
 import mmwsdr
 import socket
-import eder
 
-path = os.path.abspath('../../../../ederenv/Eder_A/')
+path = os.path.abspath('../../../lib/ederenv/Eder_A/')
 if path not in sys.path:
     sys.path.append(path)
-
+import eder
 
 class Sivers60GHz(object):
     """
