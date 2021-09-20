@@ -5,7 +5,9 @@ and sends samples to the DACs in non-realtime mode. The application running in t
 is based on a modified version of Xilinx `rftool`.
 
 :organization: New York University
+
 :authors: Panagiotis Skrimponis
+
 :copyright: 2021
 """
 
