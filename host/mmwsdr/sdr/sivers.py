@@ -36,15 +36,16 @@ class Sivers60GHz(object):
         self.fc = freq
         self.isdebug = isdebug
         self.sock = None
-
-        # Establish connection with the COSMOS TCP Server.
-        self.__connect()
+        self.fpga = None
+        self.array = None
 
         # Create the FPGA and the Array object
-        self.fpga = mmwsdr.fpga.ZCU111(ip=ip, isdebug=isdebug)
-        self.array = eder.Eder(init=True, unit_name=unit_name, board_type=board_type, eder_version=eder_version)
+        self.array = eder.Eder(init=False, unit_name=unit_name, board_type=board_type, eder_version=eder_version)
         self.array.check()
-
+        self.fpga = mmwsdr.fpga.ZCU111(ip=ip, isdebug=isdebug)
+        
+        # Establish connection with the COSMOS TCP Server.
+        self.__connect()
         # Initialize the beam index
         self.beam_index = 0
 

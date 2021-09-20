@@ -29,7 +29,7 @@ def main():
     """
 
     # Create an SDR object
-    sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', unit_name='SN0243', isdebug=isdebug)
+    sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', unit_name='SN0240', isdebug=isdebug)
     sdr0.fpga.configure('../../config/rfsoc.cfg')
 
     # Make sure that the nodes are not transmitting
@@ -50,16 +50,13 @@ def main():
 
     # Transmit data
     sdr0.send(txtd)
-
-    # Receive data
-    rxtd = sdr0.recv(nread, nskip, nbatch)
-
-    rxfd = np.fft.fft(rxtd, axis=1)
-    rxfd = np.fft.fftshift(rxfd, axes=1)
-    f = np.linspace(-nfft / 2, nfft / 2)
-    for ibatch in range(nbatch):
-        plt.plot((abs(rxfd[ibatch, :])), '-')
-    plt.show()
+    
+    while(1):
+        ans = raw_input("Enter 'q' to exit or\n Enter beam index: ")
+        if ans == 'q':
+            break
+        elif ans.isdigit():
+            sdr0.beam_index = int(ans)
 
     # Close the TPC connections
     del sdr0
