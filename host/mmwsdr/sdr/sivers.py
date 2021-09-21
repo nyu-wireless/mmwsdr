@@ -72,7 +72,8 @@ class Sivers60GHz(object):
         :return:
         :rtype:
         """
-        self.mode = 'TX'
+        if self.mode is not 'TX':
+            self.mode = 'TX'
         self.fpga.send(txtd)
 
     def recv(self, nread, nskip, nbatch):
@@ -91,7 +92,8 @@ class Sivers60GHz(object):
         # (Number of batch) * (samples per batch) * (# of channel) * (I/Q)
         nsamp = nbatch * nread * self.fpga.nch * 2
 
-        self.mode = 'RX'
+        if self.mode is not 'RX':
+            self.mode = 'RX'
         self.sock.sendall(b'+ %d %d %d\r\n' % (nread / self.fpga.npar, nskip / self.fpga.npar, nsamp * 2))
 
         rxtd = self.fpga.recv(nsamp)
