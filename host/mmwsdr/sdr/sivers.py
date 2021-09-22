@@ -147,6 +147,7 @@ class Sivers60GHz(object):
         """
         if array_mode is 'TX':
             self.array.run_tx(freq=self.fc)
+            self.array.run_tx_lo_leakage_cal()
         elif array_mode is 'RX':
             self.array.run_rx(freq=self.fc)
         else:
