@@ -91,8 +91,8 @@ def main():
     :rtype:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("--freq", type=float, nargs='?', const=60.48e9, help="receiver carrier frequency in Hz (i.e., 60.48e9)")
-    parser.add_argument("--node", type=str, nargs='?', const='sdr2-in1', help="cosmos-sb1 node name (i.e., sdr2-in1)")
+    parser.add_argument("--freq", type=float, default=60.48e9, help="receiver carrier frequency in Hz (i.e., 60.48e9)")
+    parser.add_argument("--node", type=str, default='sdr2-in1', help="cosmos-sb1 node name (i.e., sdr2-in1)")
     args = parser.parse_args()
 
     # Create an SDR object
