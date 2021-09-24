@@ -33,7 +33,7 @@ class Sivers60GHz(object):
     def __init__(self, ip='10.115.1.3', freq=60.48e9, unit_name='SN0240', board_type='MB1', eder_version='2',
                  isdebug=False):
         self.ip = ip
-        self.fc = freq
+        self.freq = freq
         self.isdebug = isdebug
         self.sock = None
         self.fpga = None
@@ -43,7 +43,7 @@ class Sivers60GHz(object):
         self.array = eder.Eder(init=False, unit_name=unit_name, board_type=board_type, eder_version=eder_version)
         self.array.check()
         self.fpga = mmwsdr.fpga.ZCU111(ip=ip, isdebug=isdebug)
-        
+
         # Establish connection with the COSMOS TCP Server.
         self.__connect()
         # Initialize the beam index
@@ -105,27 +105,24 @@ class Sivers60GHz(object):
         return rxtd
 
     @property
-    def fc(self):
+    def freq(self):
         """
         Get the carrier frequency of the SDR
 
         :return: The carrier frequency in Hz
         :rtype: float
         """
-        return self.__fc
+        return self.__freq
 
-    @fc.setter
-    def fc(self, freq):
+    @freq.setter
+    def freq(self, freq):
         """
         Set the SDR carrier frequency
 
         :param freq: Carrier frequency in Hz
         :type freq: float
         """
-        if freq == 58.32e9 or freq == 60.48e9 or freq == 62.64e9 or freq == 64.8e9:
-            self.__fc = freq
-        else:
-            raise NotImplemented
+        self.__freq = freq
 
     @property
     def mode(self):
@@ -146,10 +143,9 @@ class Sivers60GHz(object):
         :type array_mode: str
         """
         if array_mode is 'TX':
-            self.array.run_tx(freq=self.fc)
-            self.array.run_tx_lo_leakage_cal()
+            self.array.run_tx(freq=self.freq)
         elif array_mode is 'RX':
-            self.array.run_rx(freq=self.fc)
+            self.array.run_rx(freq=self.freq)
         else:
             raise NotImplemented
 
