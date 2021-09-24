@@ -5,11 +5,8 @@
 # Import Libraries
 import os
 import sys
+import argparse
 import numpy as np
-
-import matplotlib
-matplotlib.use('TkAgg')
-from matplotlib import pyplot as plt
 
 path = os.path.abspath('../../')
 if not path in sys.path:
@@ -17,11 +14,10 @@ if not path in sys.path:
 import mmwsdr
 
 # Parameters
-nread = 1024  # num of continuous samples per batch
-nskip = 1024  # num of samples to skip between batches
-nbatch = 10  # num of batches
+sc = 400  # subcarrier index
+nfft = 1024  # num of continuous samples
 tx_pwr = 10000  # transmit power
-isdebug = True
+isdebug = True  # print debug messages
 
 
 def main():
@@ -30,17 +26,25 @@ def main():
     :return:
     :rtype:
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--freq", type=float, const=60.48e9, help="receiver carrier frequency in Hz (i.e., 60.48e9)")
+    parser.add_argument("--node", type=str, const='rfdev3-in1', help="cosmos-sb1 node name (i.e., rfdev3-in1)")
+    args = parser.parse_args()
 
     # Create an SDR object
-    sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', unit_name='SN0240', isdebug=isdebug)
+    if args.node == 'rfdev3-in1':
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug)
+    elif args.node == 'rfdev3-in2':
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug)
+    else:
+        raise ValueError("COSMOS node can be either 'rfdev3-in1' or 'rfdev3-in2'")
+
     sdr0.fpga.configure('../../config/rfsoc.cfg')
 
     # Make sure that the nodes are not transmitting
-    sdr0.send(np.zeros((nread,), dtype='int16'))
+    sdr0.send(np.zeros((nfft,), dtype='int16'))
 
     # Create a signal in frequency domain
-    sc = 100  # subcarrier index.
-    nfft = nread
     txfd = np.zeros((nfft,), dtype='int16')
     txfd[(nfft >> 1) + sc] = 1
     txfd = np.fft.fftshift(txfd, axes=0)
@@ -53,9 +57,13 @@ def main():
 
     # Transmit data
     sdr0.send(txtd)
-    
-    while(1):
-        ans = raw_input("Enter 'q' to exit or\n Enter beam index: ")
+
+    while (1):
+        if sys.version_info[0] == 2:
+            ans = raw_input("Enter 'q' to exit or\n Enter beam index: ")
+        else:
+            ans = input("Enter 'q' to exit or\n Enter beam index: ")
+
         if ans == 'q':
             break
         elif ans.isdigit():

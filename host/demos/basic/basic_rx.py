@@ -5,9 +5,10 @@
 # Import Libraries
 import os
 import sys
+import argparse
 import numpy as np
-
 import matplotlib
+
 matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
 
@@ -17,11 +18,11 @@ if not path in sys.path:
 import mmwsdr
 
 # Parameters
-nread = 1024  # num of continuous samples per batch
+nfft = 1024  # num of continuous samples per batch
 nskip = 1024  # num of samples to skip between batches
 nbatch = 10  # num of batches
-tx_pwr = 10000  # transmit power
-isdebug = True
+isdebug = True  # print debug messages
+node = 'rfdev3-in1'  # 'rfdev3-in1' or 'rfdev3-in2'
 
 
 def main():
@@ -30,17 +31,27 @@ def main():
     :return:
     :rtype:
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--freq", type=float, const=60.48e9, help="receiver carrier frequency in Hz (i.e., 60.48e9)")
+    parser.add_argument("--node", type=str, const='rfdev3-in1', help="cosmos-sb1 node name (i.e., rfdev3-in1)")
+    args = parser.parse_args()
 
     # Create an SDR object
-    sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', unit_name='SN0243', isdebug=isdebug)
+    if args.node == 'rfdev3-in1':
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug)
+    elif args.node == 'rfdev3-in2':
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug)
+    else:
+        raise ValueError("COSMOS node can be either 'rfdev3-in1' or 'rfdev3-in2'")
+
     sdr0.fpga.configure('../../config/rfsoc.cfg')
 
     # Make sure that the nodes are not transmitting
-    sdr0.send(np.zeros((nread,), dtype='int16'))
+    sdr0.send(np.zeros((nfft,), dtype='int16'))
 
-    while(1):
+    while (1):
         # Receive data
-        rxtd = sdr0.recv(nread, nskip, nbatch)
+        rxtd = sdr0.recv(nfft, nskip, nbatch)
 
         rxfd = np.fft.fft(rxtd, axis=1)
         rxfd = np.fft.fftshift(rxfd, axes=1)
@@ -48,8 +59,12 @@ def main():
         for ibatch in range(nbatch):
             plt.plot((abs(rxfd[ibatch, :])), '-')
         plt.show()
-        
-        ans = raw_input("Enter 'q' to exit or\n Press enter to receive again: ")
+
+        if sys.version_info[0] == 2:
+            ans = raw_input("Enter 'q' to exit or\n Press enter to receive again: ")
+        else:
+            ans = input("Enter 'q' to exit or\n Press enter to receive again: ")
+
         if ans == 'q':
             break
     # Close the TPC connections
