@@ -32,15 +32,6 @@ class XYTable(object):
         self.current_position = None
         self.target_position = None
 
-    def __del__(self):
-        """
-
-        :return:
-        :rtype:
-        """
-        del self.table
-        del self.main_url
-
     @property
     def table(self):
         """
@@ -74,7 +65,7 @@ class XYTable(object):
             raise SystemExit(err)
         else:
             # Success: print status of the xytable
-            json_data = json.dumps(xmltodict.parse(r.content))
+            json_data = json.loads(json.dumps(xmltodict.parse(r.content)))
             table_data = json_data['response']['action']['xy_table']
             self.xy_status = table_data['@xy_status']
             self.rotator_status = table_data['@rotator_status']
@@ -101,7 +92,7 @@ class XYTable(object):
         :return:
         :rtype:
         """
-        # TODO: check that x,y, angle are valid inputs according to COSMOS specs
+
         params = {'name': self.table + '.sb1.cosmos-lab.org',
                   'x': x,
                   'y': y,
@@ -113,7 +104,7 @@ class XYTable(object):
             raise SystemExit(err)
         else:
             # Success: print new position of the xytable
-            json_data = json.dumps(xmltodict.parse(r.content))
+            json_data = json.loads(json.dumps(xmltodict.parse(r.content)))
             table_data = json_data['response']['action']['xy_table']
             self.xy_status = table_data['@xy_status']
             self.rotator_status = table_data['@rotator_status']
@@ -134,6 +125,7 @@ class XYTable(object):
         :return:
         :rtype:
         """
+        
         params = {'name': self.table + '.sb1.cosmos-lab.org'}
         try:
             r = requests.get(url=self.main_url + 'stop', params=params)
@@ -142,7 +134,7 @@ class XYTable(object):
             raise SystemExit(err)
         else:
             # Success: print the current stop position of the xytable
-            json_data = json.dumps(xmltodict.parse(r.content))
+            json_data = json.loads(json.dumps(xmltodict.parse(r.content)))
             table_data = json_data['response']['action']['xy_table']
             self.xy_status = table_data['@xy_status']
             self.rotator_status = table_data['@rotator_status']

@@ -41,13 +41,13 @@ def main():
     # Create an SDR object and the XY table
     if args.node == 'sdr2-in1':
         sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug)
-        xytable0 = mmwsdr.utils.XYTable('xytable1')
+        xytable0 = mmwsdr.utils.XYTable('xytable1', isdebug=isdebug)
 
         # Move the SDR to the lower-right corner
         xytable0.move(x=0, y=0, angle=0)
     elif args.node == 'sdr2-in2':
         sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug)
-        xytable0 = mmwsdr.utils.XYTable('xytable2')
+        xytable0 = mmwsdr.utils.XYTable('xytable2', isdebug=isdebug)
 
         # Move the SDR to the lower-left conrner
         xytable0.move(x=1300, y=0, angle=0)
