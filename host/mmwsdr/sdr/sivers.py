@@ -33,16 +33,16 @@ class Sivers60GHz(object):
     def __init__(self, ip='10.115.1.3', freq=60.48e9, unit_name='SN0240', board_type='MB1', eder_version='2',
                  isdebug=False):
         self.ip = ip
-        self.freq = freq
         self.isdebug = isdebug
         self.sock = None
         self.fpga = None
         self.array = None
 
         # Create the FPGA and the Array object
-        self.array = eder.Eder(init=False, unit_name=unit_name, board_type=board_type, eder_version=eder_version)
+        self.array = eder.Eder(init=True, unit_name=unit_name, board_type=board_type, eder_version=eder_version)
         self.array.check()
         self.fpga = mmwsdr.fpga.ZCU111(ip=ip, isdebug=isdebug)
+        self.freq = freq
 
         # Establish connection with the COSMOS TCP Server.
         self.__connect()
@@ -124,6 +124,15 @@ class Sivers60GHz(object):
         """
         self.__freq = freq
 
+        if self.mode == 'TX':
+            self.array.reset()
+            self.array.tx_disable()
+            self.array.run_tx(freq=self.freq)
+        elif self.mode == 'RX':
+            self.array.reset()
+            self.array.rx_disable()
+            self.array.run_rx(freq=self.freq)
+
     @property
     def mode(self):
         """
@@ -142,9 +151,9 @@ class Sivers60GHz(object):
         :param array_mode: 'RX' for receive mode or TX' for transmit mode
         :type array_mode: str
         """
-        if array_mode is 'TX':
+        if array_mode == 'TX':
             self.array.run_tx(freq=self.freq)
-        elif array_mode is 'RX':
+        elif array_mode == 'RX':
             self.array.run_rx(freq=self.freq)
         else:
             raise NotImplemented
