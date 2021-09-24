@@ -26,7 +26,7 @@ class XYTable(object):
         :type table_name:
         """
         self.table = table_name  # either xytable1 or xytable2
-        self.main_url = 'https://localhost:5054/xy_table/'
+        self.main_url = 'http://localhost:5054/xy_table/'
         self.xy_status = None
         self.rotator_status = None
         self.current_position = None
