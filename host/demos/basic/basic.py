@@ -38,11 +38,19 @@ def main():
     parser.add_argument("--mode", type=str, default='rx', help="sdr mode (i.e., rx)")
     args = parser.parse_args()
 
-    # Create an SDR object
+    # Create an SDR object and the XY table
     if args.node == 'sdr2-in1':
         sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug)
+        xytable0 = mmwsdr.utils.xytable('xytable1')
+
+        # Move the SDR to the lower-right corner
+        xytable0.move(x=0, y=0, angle=0)
     elif args.node == 'sdr2-in2':
         sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug)
+        xytable0 = mmwsdr.utils.xytable('xytable2')
+
+        # Move the SDR to the lower-left conrner
+        xytable0.move(x=1300, y=0, angle=0)
     else:
         raise ValueError("COSMOS node can be either 'sdr2-in1' or 'sdr2-in2'")
 

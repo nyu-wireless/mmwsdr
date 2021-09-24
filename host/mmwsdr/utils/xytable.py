@@ -19,14 +19,14 @@ class XYTable(object):
     XYTable class
     """
 
-    def __init__(self, table_name):
+    def __init__(self, table_name, isdebug=False):
         """
 
         :param table_name:
         :type table_name:
         """
         self.table = table_name  # either xytable1 or xytable2
-        self.main_url = 'https://am1.cosmos-lab.org:5054/xy_table/'
+        self.main_url = 'https://localhost:5054/xy_table/'
         self.xy_status = None
         self.rotator_status = None
         self.current_position = None
@@ -82,8 +82,11 @@ class XYTable(object):
             target_pos = table_data['target_position']
             self.current_position = [current_pos['@x'], current_pos['@y'], current_pos['@angle']]
             self.target_position = [target_pos['@x'], target_pos['@y'], target_pos['@angle']]
-            # print(f"The current position: {self.current_position}")
-            # print(f"The target position: {self.target_position}")
+
+            if self.isdebug:
+                print(f"The current position: {self.current_position}")
+                print(f"The target position: {self.target_position}")
+
             return self.xy_status, self.rotator_status, self.current_position, self.target_position
 
     def move(self, x, y, angle):
@@ -118,8 +121,11 @@ class XYTable(object):
             target_pos = table_data['target_position']
             self.current_position = [current_pos['@x'], current_pos['@y'], current_pos['@angle']]
             self.target_position = [target_pos['@x'], target_pos['@y'], target_pos['@angle']]
-            # print(f"The current position: {self.current_position}")
-            # print(f"The target position: {self.target_position}")
+
+            if self.isdebug:
+                print(f"The current position: {self.current_position}")
+                print(f"The target position: {self.target_position}")
+
             return self.xy_status, self.rotator_status, self.current_position, self.target_position
 
     def stop(self):
@@ -142,5 +148,8 @@ class XYTable(object):
             self.rotator_status = table_data['@rotator_status']
             current_pos = table_data['current_position']
             self.current_position = [current_pos['@x'], current_pos['@y'], current_pos['@angle']]
-            # print(f"The current position: {self.current_position}")
+
+            if self.isdebug:
+                print(f"The current position: {self.current_position}")
+
             return self.xy_status, self.rotator_status, self.current_position

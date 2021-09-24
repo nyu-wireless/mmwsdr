@@ -27,6 +27,12 @@
     </tbody>
 </table>
 
+
+```bash
+<user>@console:~$ ssh -Y root@srv1-in1 -R 5054:am1.cosmos-lab.org:5054
+<user>@console:~$ ssh -Y root@srv1-in2 -R 5054:am1.cosmos-lab.org:5054
+```
+
 ## More Information
 The above information has been collected from the COSMOS wiki pages. Please refer to them for more information
 and examples.
