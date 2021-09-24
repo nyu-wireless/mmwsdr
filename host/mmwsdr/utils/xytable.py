@@ -84,8 +84,8 @@ class XYTable(object):
             self.target_position = [target_pos['@x'], target_pos['@y'], target_pos['@angle']]
 
             if self.isdebug:
-                print(f"The current position: {self.current_position}")
-                print(f"The target position: {self.target_position}")
+                print("The current position: {}".format(self.current_position))
+                print("The target position: {}".format(self.target_position))
 
             return self.xy_status, self.rotator_status, self.current_position, self.target_position
 
@@ -123,8 +123,8 @@ class XYTable(object):
             self.target_position = [target_pos['@x'], target_pos['@y'], target_pos['@angle']]
 
             if self.isdebug:
-                print(f"The current position: {self.current_position}")
-                print(f"The target position: {self.target_position}")
+                print("The current position: {}".format(self.current_position))
+                print("The target position: {}".format(self.target_position))
 
             return self.xy_status, self.rotator_status, self.current_position, self.target_position
 
@@ -150,6 +150,6 @@ class XYTable(object):
             self.current_position = [current_pos['@x'], current_pos['@y'], current_pos['@angle']]
 
             if self.isdebug:
-                print(f"The current position: {self.current_position}")
+                print("The current position: {}".format(self.current_position))
 
             return self.xy_status, self.rotator_status, self.current_position
