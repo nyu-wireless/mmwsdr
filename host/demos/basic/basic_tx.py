@@ -28,16 +28,16 @@ def main():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--freq", type=float, const=60.48e9, help="receiver carrier frequency in Hz (i.e., 60.48e9)")
-    parser.add_argument("--node", type=str, const='rfdev3-in1', help="cosmos-sb1 node name (i.e., rfdev3-in1)")
+    parser.add_argument("--node", type=str, const='sdr2-in1', help="cosmos-sb1 node name (i.e., sdr2-in1)")
     args = parser.parse_args()
 
     # Create an SDR object
-    if args.node == 'rfdev3-in1':
+    if args.node == 'sdr2-in1':
         sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug)
-    elif args.node == 'rfdev3-in2':
+    elif args.node == 'sdr2-in2':
         sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug)
     else:
-        raise ValueError("COSMOS node can be either 'rfdev3-in1' or 'rfdev3-in2'")
+        raise ValueError("COSMOS node can be either 'sdr2-in1' or 'sdr2-in2'")
 
     sdr0.fpga.configure('../../config/rfsoc.cfg')
 
