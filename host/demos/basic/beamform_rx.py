@@ -23,8 +23,10 @@ nfft = 1024  # num of continuous samples per batch
 nskip = 1024 * 5  # num of samples to skip between batches
 nbatch = 10  # num of batches
 isdebug = True  # print debug messages
-sc = 400  # subcarrier index
+sc_min = -256  # min subcarrier index
+sc_max = 256  # max subcarrier index
 tx_pwr = 10000  # transmit power
+qam = (1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j)
 
 
 def main():
@@ -66,7 +68,7 @@ def main():
 
             # Create a signal in frequency domain
             txfd = np.zeros((nfft,), dtype='int16')
-            txfd[(nfft >> 1) + sc] = 1
+            txfd[(nfft >> 1 + sc_min):(nfft >> 1 + sc_max)] = np.random.choice(qam, len(range(sc_min, sc_max)))
             txfd = np.fft.fftshift(txfd, axes=0)
 
             # Then, convert it to time domain
@@ -88,7 +90,7 @@ def main():
                 rxtd = sdr0.recv(nfft, nskip, nbatch)
                 rxfd = np.fft.fft(rxtd, axis=1)
                 rxfd = np.fft.fftshift(rxfd, axes=1)
-                rx_pwr[iaoa] = np.sum(np.abs(rxfd))
+                rx_pwr[iaoa] = np.sum(np.abs(rxfd[:,(nfft >> 1 + sc_min):(nfft >> 1 + sc_max)]))
 
             plt.plot(rx_pwr)
             plt.xlabel('Angle of Arrival [Deg]')
