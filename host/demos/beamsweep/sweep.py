@@ -56,7 +56,7 @@ def main():
     if args.mode == 'tx':
         # Create a signal in frequency domain
         txfd = np.zeros((nfft,), dtype='int16')
-        txfd[(nfft >> 1 + sc_min):(nfft >> 1 + sc_max)] = np.random.choice(qam, len(512))
+        txfd[((nfft >> 1) + sc_min):((nfft >> 1) + sc_max)] = np.random.choice(qam, len(512))
         txfd = np.fft.fftshift(txfd, axes=0)
 
         # Then, convert it to time domain

@@ -68,7 +68,7 @@ def main():
 
             # Create a signal in frequency domain
             txfd = np.zeros((nfft,), dtype='int16')
-            txfd[(nfft >> 1 + sc_min):(nfft >> 1 + sc_max)] = np.random.choice(qam, len(range(sc_min, sc_max)))
+            txfd[((nfft >> 1) + sc_min):((nfft >> 1) + sc_max)] = np.random.choice(qam, len(range(sc_min, sc_max)))
             txfd = np.fft.fftshift(txfd, axes=0)
 
             # Then, convert it to time domain
@@ -90,7 +90,7 @@ def main():
                 rxtd = sdr0.recv(nfft, nskip, nbatch)
                 rxfd = np.fft.fft(rxtd, axis=1)
                 rxfd = np.fft.fftshift(rxfd, axes=1)
-                rx_pwr[iaoa] = np.sum(np.abs(rxfd[:,(nfft >> 1 + sc_min):(nfft >> 1 + sc_max)]))
+                rx_pwr[iaoa] = np.sum(np.abs(rxfd[:,((nfft >> 1) + sc_min):((nfft >> 1) + sc_max)]))
 
             plt.plot(rx_pwr)
             plt.xlabel('Angle of Arrival [Deg]')
