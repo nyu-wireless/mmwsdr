@@ -25,6 +25,7 @@ class XYTable(object):
         :param table_name:
         :type table_name:
         """
+        self.isdebug = isdebug
         self.table = table_name  # either xytable1 or xytable2
         self.main_url = 'http://localhost:5054/xy_table/'
         self.xy_status = None
@@ -125,7 +126,7 @@ class XYTable(object):
         :return:
         :rtype:
         """
-        
+
         params = {'name': self.table + '.sb1.cosmos-lab.org'}
         try:
             r = requests.get(url=self.main_url + 'stop', params=params)
