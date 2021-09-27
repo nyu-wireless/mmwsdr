@@ -72,8 +72,7 @@ def main():
             txtd = np.fft.ifft(txfd, axis=0)
 
             # Set the tx power
-            txtd -= np.mean(txtd)
-            txtd = txtd / np.max(np.abs(txfd.real), np.abs(txfd.imag)) * tx_pwr
+            txtd = txtd / np.max([np.abs(txtd.real), np.abs(txtd.imag)]) * tx_pwr
 
             # Transmit data
             sdr0.send(txtd)
@@ -89,6 +88,9 @@ def main():
             plt.xlabel('Subcarrier index')
             plt.xlabel('Magnitude [dB]')
             plt.tight_layout()
+            y_min = np.mean(20 * np.log10(abs(rxfd))) - 20
+            y_max = np.max(20 * np.log10(abs(rxfd))) + 20
+            plt.ylim([y_min, y_max])
             plt.grid()
             plt.show()
         else:

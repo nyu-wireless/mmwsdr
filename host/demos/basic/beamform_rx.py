@@ -25,7 +25,7 @@ nbatch = 100  # num of batches
 isdebug = True  # print debug messages
 sc_min = -400  # min subcarrier index
 sc_max = 400  # max subcarrier index
-tx_pwr = 16000  # transmit power
+tx_pwr = 20000  # transmit power
 qam = (1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j)
 
 
@@ -75,8 +75,7 @@ def main():
             txtd = np.fft.ifft(txfd, axis=0)
 
             # Set the tx power
-            txtd -= np.mean(txtd)
-            txtd = txtd / np.max(np.abs(txfd.real), np.abs(txfd.imag)) * tx_pwr
+            txtd = txtd / np.max([np.abs(txtd.real), np.abs(txtd.imag)]) * tx_pwr
 
             # Transmit data
             sdr0.send(txtd)

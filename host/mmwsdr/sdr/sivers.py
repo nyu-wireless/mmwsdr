@@ -125,7 +125,7 @@ class Sivers60GHz(object):
         self.array.reset()
         self.array.tx_disable()
         self.array.rx_disable()
-        self.mode = self.array.mode()
+        self.mode = self.array.mode
 
     @property
     def mode(self):
@@ -146,16 +146,16 @@ class Sivers60GHz(object):
         :type array_mode: str
         """
         if array_mode == 'TX':
-            self.array.run_tx(freq=self.freq)
             self.array.run_tx_lo_leakage_cal()
-            self.array.regs.wrrd('tx_bb_ctrl', 0x17)
-            self.array.regs.wrrd('tx_bf_gain', 0x0d)
-            self.array.regs.wrrd('tx_rf_gain', 0x0d)
-            self.regs.wrrd('tx_bb_gain', 0x03)
+            self.array.run_tx(freq=self.freq)
+            self.array.tx.regs.wr('tx_bb_ctrl', 0x17)
+            self.array.tx.regs.wr('tx_bf_gain', 0x0d)
+            self.array.tx.regs.wr('tx_rf_gain', 0x0d)
+            self.array.tx.regs.wr('tx_bb_gain', 0x03)
         elif array_mode == 'RX':
             self.array.run_rx(freq=self.freq)
             self.array.rx.dco.run()
-            self.regs.wrrd('rx_bf_rf_gain', 0xee)
+            self.array.rx.regs.wr('rx_bf_rf_gain', 0xee)
 
     @property
     def beam_index(self):
