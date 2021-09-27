@@ -19,11 +19,11 @@ import mmwsdr
 
 # Parameters
 nfft = 1024  # num of continuous samples per batch
-nskip = 1024 * 5  # num of samples to skip between batches
-nbatch = 10  # num of batches
+nskip = 1024  # num of samples to skip between batches
+nbatch = 5  # num of batches
 isdebug = True  # print debug messages
 sc = 400  # subcarrier index
-tx_pwr = 10000  # transmit power
+tx_pwr = 4000  # transmit power
 
 
 def main():
@@ -72,7 +72,8 @@ def main():
             txtd = np.fft.ifft(txfd, axis=0)
 
             # Set the tx power
-            txtd = txtd / np.mean(np.abs(txfd)) * tx_pwr
+            txtd -= np.mean(txtd)
+            txtd = txtd / np.max(np.abs(txfd.real), np.abs(txfd.imag)) * tx_pwr
 
             # Transmit data
             sdr0.send(txtd)
@@ -83,9 +84,10 @@ def main():
             rxfd = np.fft.fft(rxtd, axis=1)
             rxfd = np.fft.fftshift(rxfd, axes=1)
             f = np.linspace(-nfft / 2, nfft / 2 - 1, nfft)
-            plt.plot(f, abs(np.mean(rxfd, axis=0)), '-')
+            for ibatch in range(nbatch):
+                plt.plot(f, 20*np.log10(abs(rxfd[0,:])), '-')
             plt.xlabel('Subcarrier index')
-            plt.xlabel('Magnitude')
+            plt.xlabel('Magnitude [dB]')
             plt.tight_layout()
             plt.grid()
             plt.show()

@@ -21,11 +21,11 @@ import mmwsdr
 naoa = 64
 nfft = 1024  # num of continuous samples per batch
 nskip = 1024 * 5  # num of samples to skip between batches
-nbatch = 10  # num of batches
+nbatch = 100  # num of batches
 isdebug = True  # print debug messages
-sc_min = -256  # min subcarrier index
-sc_max = 256  # max subcarrier index
-tx_pwr = 10000  # transmit power
+sc_min = -400  # min subcarrier index
+sc_max = 400  # max subcarrier index
+tx_pwr = 16000  # transmit power
 qam = (1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j)
 
 
@@ -75,7 +75,8 @@ def main():
             txtd = np.fft.ifft(txfd, axis=0)
 
             # Set the tx power
-            txtd = txtd / np.mean(np.abs(txfd)) * tx_pwr
+            txtd -= np.mean(txtd)
+            txtd = txtd / np.max(np.abs(txfd.real), np.abs(txfd.imag)) * tx_pwr
 
             # Transmit data
             sdr0.send(txtd)
