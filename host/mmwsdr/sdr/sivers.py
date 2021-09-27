@@ -46,8 +46,6 @@ class Sivers60GHz(object):
 
         # Establish connection with the COSMOS TCP Server.
         self.__connect()
-        # Initialize the beam index
-        self.beam_index = 0
 
     def __del__(self):
         self.__disconnect()
@@ -124,14 +122,10 @@ class Sivers60GHz(object):
         """
         self.__freq = freq
 
-        if self.mode == 'TX':
-            self.array.reset()
-            self.array.tx_disable()
-            self.array.run_tx(freq=self.freq)
-        elif self.mode == 'RX':
-            self.array.reset()
-            self.array.rx_disable()
-            self.array.run_rx(freq=self.freq)
+        self.array.reset()
+        self.array.tx_disable()
+        self.array.rx_disable()
+        self.mode = self.array.mode()
 
     @property
     def mode(self):
@@ -153,10 +147,10 @@ class Sivers60GHz(object):
         """
         if array_mode == 'TX':
             self.array.run_tx(freq=self.freq)
+            self.array.run_tx_lo_leakage_cal()
         elif array_mode == 'RX':
             self.array.run_rx(freq=self.freq)
-        else:
-            raise NotImplemented
+            self.array.rx.dco.run()
 
     @property
     def beam_index(self):
