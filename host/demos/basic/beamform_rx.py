@@ -67,7 +67,7 @@ def main():
             sdr0.send(np.zeros((nfft,), dtype='int16'))
 
             # Create a signal in frequency domain
-            txfd = np.zeros((nfft,), dtype='int16')
+            txfd = np.zeros((nfft,), dtype='complex')
             txfd[((nfft >> 1) + sc_min):((nfft >> 1) + sc_max)] = np.random.choice(qam, len(range(sc_min, sc_max)))
             txfd = np.fft.fftshift(txfd, axes=0)
 
