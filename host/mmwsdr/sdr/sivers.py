@@ -148,9 +148,14 @@ class Sivers60GHz(object):
         if array_mode == 'TX':
             self.array.run_tx(freq=self.freq)
             self.array.run_tx_lo_leakage_cal()
+            self.array.regs.wrrd('tx_bb_ctrl', 0x17)
+            self.array.regs.wrrd('tx_bf_gain', 0x0d)
+            self.array.regs.wrrd('tx_rf_gain', 0x0d)
+            self.regs.wrrd('tx_bb_gain', 0x03)
         elif array_mode == 'RX':
             self.array.run_rx(freq=self.freq)
             self.array.rx.dco.run()
+            self.regs.wrrd('rx_bf_rf_gain', 0xee)
 
     @property
     def beam_index(self):
