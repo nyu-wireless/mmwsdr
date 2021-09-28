@@ -20,7 +20,7 @@ if not path in sys.path:
 import mmwsdr
 
 # Parameters
-naod = 64
+naod = 101
 nfft = 1024  # num of continuous samples per batch
 nskip = 1024 * 5  # num of samples to skip between batches
 nbatch = 100  # num of batches
@@ -31,7 +31,7 @@ tx_pwr = 20000  # transmit power
 qam = (1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j)
 
 # Find the angles of arrival
-aod = (np.arange(naod) - 31) / 0.711111111111111
+aod = np.linspace(-45, 45, naod)
 
 def main():
     """
@@ -89,7 +89,7 @@ def main():
         for iaod in range(naod):
             if args.mode == 'tx':
                 # set AoD
-                sdr0.beam_index = iaod
+                xytable0.move(x=1300, y=0, angle=aod[iaod])
             elif args.mode == 'rx':
                 # Receive data
                 rxtd = sdr0.recv(nfft, nskip, nbatch)

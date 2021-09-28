@@ -20,7 +20,7 @@ if not path in sys.path:
 import mmwsdr
 
 # Parameters
-naoa = 64
+naoa = 101
 nfft = 1024  # num of continuous samples per batch
 nskip = 1024 * 5  # num of samples to skip between batches
 nbatch = 100  # num of batches
@@ -31,7 +31,7 @@ tx_pwr = 20000  # transmit power
 qam = (1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j)
 
 # Find the angles of arrival
-aoa = (np.arange(naoa) - 31) / 0.711111111111111
+aoa = np.linspace(-45,45,naoa)
 
 
 def main():
