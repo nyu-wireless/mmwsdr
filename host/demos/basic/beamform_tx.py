@@ -20,7 +20,7 @@ if not path in sys.path:
 import mmwsdr
 
 # Parameters
-naoa = 64
+naod = 64
 nfft = 1024  # num of continuous samples per batch
 nskip = 1024 * 5  # num of samples to skip between batches
 nbatch = 100  # num of batches
@@ -31,7 +31,7 @@ tx_pwr = 20000  # transmit power
 qam = (1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j)
 
 # Find the angles of arrival
-aoa = (np.arange(naoa) - 31) / 0.711111111111111
+aod = (np.arange(naod) - 31) / 0.711111111111111
 
 def main():
     """
@@ -66,10 +66,9 @@ def main():
 
     # Main loop
     while (1):
-        if args.mode == 'tx':
-            # Make sure that the nodes are not transmitting
-            sdr0.send(np.zeros((nfft,), dtype='int16'))
+        rx_pwr = np.zeros((naod,))
 
+        if args.mode == 'tx':
             # Create a signal in frequency domain
             txfd = np.zeros((nfft,), dtype='complex')
             txfd[((nfft >> 1) + sc_min):((nfft >> 1) + sc_max)] = np.random.choice(qam, len(range(sc_min, sc_max)))
@@ -84,31 +83,38 @@ def main():
             # Transmit data
             sdr0.send(txtd)
         elif args.mode == 'rx':
-            rx_pwr = np.zeros((naoa,))
-            # Receive data
-            for iaoa in range(naoa):
-                # set AoA
-                sdr0.beam_index = iaoa
-                time.sleep(0.5)
+            # Make sure that the node is not transmitting
+            sdr0.send(np.zeros((nfft,), dtype='int16'))
 
+        for iaoa in range(naod):
+            if args.mode == 'tx':
+                # set AoD
+                sdr0.beam_index = iaoa
+            elif args.mode == 'rx':
                 # Receive data
                 rxtd = sdr0.recv(nfft, nskip, nbatch)
                 rxfd = np.fft.fft(rxtd, axis=1)
                 rxfd = np.fft.fftshift(rxfd, axes=1)
                 rx_pwr[iaoa] = np.sum(np.abs(rxfd[:,((nfft >> 1) + sc_min):((nfft >> 1) + sc_max)]))
+            else:
+                raise ValueError("SDR mode can be either 'tx' or 'rx'")
 
+            if sys.version_info[0] == 2:
+                ans = raw_input("Press enter to continue ")
+            else:
+                ans = input("Press enter to continue ")
+
+        if args.mode == 'rx':
             # Normalize the received power
             rx_pwr /= np.max(rx_pwr)
 
             # plot the results
-            plt.plot(aoa, 20*np.log10(rx_pwr))
-            plt.xlabel('Angle of arrival [Deg]')
+            plt.plot(aod, 20 * np.log10(rx_pwr))
+            plt.xlabel('Angle of departure [Deg]')
             plt.ylabel('Power [dB]')
             plt.tight_layout()
             plt.grid()
             plt.show()
-        else:
-            raise ValueError("SDR mode can be either 'tx' or 'rx'")
 
         if sys.version_info[0] == 2:
             ans = raw_input("Enter 'q' to exit or\n press enter to continue ")

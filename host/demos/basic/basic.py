@@ -60,8 +60,6 @@ def main():
     # Main loop
     while (1):
         if args.mode == 'tx':
-            # Make sure that the nodes are not transmitting
-            sdr0.send(np.zeros((nfft,), dtype='int16'))
 
             # Create a signal in frequency domain
             txfd = np.zeros((nfft,), dtype='complex')
@@ -77,6 +75,9 @@ def main():
             # Transmit data
             sdr0.send(txtd)
         elif args.mode == 'rx':
+            # Make sure that the node is not transmitting
+            sdr0.send(np.zeros((nfft,), dtype='int16'))
+
             # Receive data
             rxtd = sdr0.recv(nfft, nskip, nbatch)
 
