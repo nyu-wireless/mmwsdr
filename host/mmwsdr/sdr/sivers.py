@@ -149,8 +149,8 @@ class Sivers60GHz(object):
             self.array.run_tx_lo_leakage_cal()
             self.array.run_tx(freq=self.freq)
             self.array.tx.regs.wr('tx_bb_ctrl', 0x17)
-            self.array.tx.regs.wr('tx_bf_gain', 0x0d)
-            self.array.tx.regs.wr('tx_rf_gain', 0x0d)
+            self.array.tx.regs.wr('tx_bf_gain', 0x0e)
+            self.array.tx.regs.wr('tx_rf_gain', 0x0e)
             self.array.tx.regs.wr('tx_bb_gain', 0x03)
         elif array_mode == 'RX':
             self.array.run_rx(freq=self.freq)
