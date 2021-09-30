@@ -102,9 +102,13 @@ class ZCU111(object):
         This function disbands the communication link between a host and a Xilinx RFSoC device
         """
         if self.sock_data != None:
+            self.sock_data.shutdown(socket.SHUT_RDWR)
+            time.sleep(0.2)
             self.sock_data.close()
 
         if self.sock_ctrl != None:
+            self.sock_ctrl.shutdown(socket.SHUT_RDWR)
+            time.sleep(0.2)
             self.sock_ctrl.close()
 
     def __send_cmd(self, cmd):

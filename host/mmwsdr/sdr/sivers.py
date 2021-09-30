@@ -49,8 +49,22 @@ class Sivers60GHz(object):
         # Establish connection with the COSMOS TCP Server.
         self.__connect()
 
-        self.cal_iq_rx_a = 1.08
-        self.cal_iq_rx_v = -0.14
+        if ip == '10.113.6.3':
+            self.cal_iq_rx_a = 1.07426956483
+            self.cal_iq_rx_v = -0.14
+            self.cal_iq_tx_a = 0.966966841446
+            self.cal_iq_tx_v = 0
+        elif ip == '10.113.6.4':
+            self.cal_iq_rx_a = 1.03818588691
+            self.cal_iq_rx_v = -0.1
+            self.cal_iq_tx_a = 1.0
+            self.cal_iq_tx_v = 0.0
+        else:
+            self.cal_iq_rx_a = 1.0
+            self.cal_iq_rx_v = 0.0
+            self.cal_iq_tx_a = 1.0
+            self.cal_iq_tx_v = 0
+
 
     def __del__(self):
         self.__disconnect()
@@ -64,7 +78,9 @@ class Sivers60GHz(object):
     def __disconnect(self):
         if self.sock != None:
             self.sock.sendall(b'disconnect\r\n')
-            time.sleep(0.1)
+            time.sleep(0.2)
+            self.sock.shutdown(socket.SHUT_RDWR)
+            time.sleep(0.2)
             self.sock.close()
 
     def apply_cal_rx(self, rxtd):
