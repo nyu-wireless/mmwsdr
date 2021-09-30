@@ -50,13 +50,13 @@ class Sivers60GHz(object):
         self.__connect()
 
         if ip == '10.113.6.3':
-            self.cal_iq_rx_a = 1.07426956483
-            self.cal_iq_rx_v = -0.14
-            self.cal_iq_tx_a = 1.03751928222
-            self.cal_iq_tx_v = 0
-        elif ip == '10.113.6.4':
             self.cal_iq_rx_a = 1.03818588691
             self.cal_iq_rx_v = -0.1
+            self.cal_iq_tx_a = 1.03751928222
+            self.cal_iq_tx_v = -0.4
+        elif ip == '10.113.6.4':
+            self.cal_iq_rx_a = 1.07426956483
+            self.cal_iq_rx_v = -0.14
             self.cal_iq_tx_a = 1.0
             self.cal_iq_tx_v = 0.0
         else:
@@ -83,6 +83,20 @@ class Sivers60GHz(object):
             time.sleep(0.2)
             self.sock.close()
 
+    def apply_cal_tx(self, txtd):
+        """
+
+        :param rxtd:
+        :type rxtd: np.array
+        :return:
+        :rtype:
+        """
+
+        # Apply RX IQ cal factors
+        re = (1 / self.cal_iq_tx_a) * txtd.real
+        im = ((-1) * re * math.tan(self.cal_iq_tx_v)) + (txtd.imag / math.cos(self.cal_iq_tx_v))
+        return re + 1j * im
+
     def apply_cal_rx(self, rxtd):
         """
 
@@ -107,6 +121,9 @@ class Sivers60GHz(object):
         """
         if self.mode is not 'TX':
             self.mode = 'TX'
+
+        if self.iscalibrated:
+            txtd = self.apply_cal_tx(txtd)
         self.fpga.send(txtd)
 
     def recv(self, nread, nskip, nbatch):

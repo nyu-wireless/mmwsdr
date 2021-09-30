@@ -138,7 +138,7 @@ def main():
             rxfd = np.fft.fft(rxtd, axis=1)
             rxfd = np.fft.fftshift(rxfd, axes=1)
 
-            sbs[ivhypo] = np.sum(rxfd[:, (nfft >> 1) + sc], axis=0)
+            sbs[ivhypo] = np.sum(np.abs(rxfd[:, (nfft >> 1) + sc]), axis=0)
 
         if sys.version_info[0] == 2:
             ans = raw_input("Press enter to continue ")
