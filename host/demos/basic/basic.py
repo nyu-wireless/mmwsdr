@@ -84,9 +84,9 @@ def main():
             rxfd = np.fft.fftshift(rxfd, axes=1)
             f = np.linspace(-nfft / 2, nfft / 2 - 1, nfft)
             for ibatch in range(nbatch):
-                plt.plot(f, 20*np.log10(abs(rxfd[0,:])), '-')
+                plt.plot(f, 20*np.log10(abs(rxfd[ibatch,:])), '-')
             plt.xlabel('Subcarrier index')
-            plt.yqlabel('Magnitude [dB]')
+            plt.ylabel('Magnitude [dB]')
             plt.tight_layout()
             y_min = np.mean(20 * np.log10(abs(rxfd))) - 20
             y_max = np.max(20 * np.log10(abs(rxfd))) + 20
