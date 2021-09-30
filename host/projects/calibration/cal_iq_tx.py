@@ -102,7 +102,7 @@ def main():
             fd[:, (nfft >> 1) - sc] = rxfd[:, (nfft >> 1) - sc]
             fd = np.fft.fftshift(fd, axes=1)
             td = np.fft.ifft(fd, axis=1)
-            sum[it] = np.sum(np.sqrt(np.mean(np.abs(td)**2, axis=1)))
+            sum[it] = np.sum(np.sqrt(np.mean(np.abs(td) ** 2, axis=1)))
         else:
             raise ValueError("SDR mode can be either 'tx' or 'rx'")
 
@@ -113,22 +113,10 @@ def main():
 
     if args.mode == 'tx':
         sdr0.freq = 61.29e9
-        sc = -256
-
-        # Create a signal in frequency domain
-        txfd = np.zeros((nfft,), dtype='complex')
-        txfd[(nfft >> 1) + sc] = 1
-        txfd = np.fft.fftshift(txfd, axes=0)
-
-        # Then, convert it to time domain
-        txtd = np.fft.ifft(txfd, axis=0)
-
-        # Set the tx power
-        txtd = txtd / np.max([np.abs(txtd.real), np.abs(txtd.imag)]) * tx_pwr
-        a = 0.966966841446
+        a = 1.03751928222
     elif args.mode == 'rx':
         sc = 166
-        a = sum[0]/sum[1]
+        a = sum[0] / sum[1]
     else:
         raise ValueError("SDR mode can be either 'tx' or 'rx'")
 
@@ -141,7 +129,7 @@ def main():
             v = vhypos[ivhypo]
             re = (1 / a) * txtd.real
             im = ((-1) * re * math.tan(v)) + (txtd.imag / math.cos(v))
-            sdr0.send(re + 1j*im)
+            sdr0.send(re + 1j * im)
         elif args.mode == 'rx':
             # Receive data
             rxtd = sdr0.recv(nfft, nskip, nbatch)
@@ -150,18 +138,13 @@ def main():
             rxfd = np.fft.fft(rxtd, axis=1)
             rxfd = np.fft.fftshift(rxfd, axes=1)
 
-            fd = np.zeros_like(rxfd)
-            fd[:, (nfft >> 1) + sc] = rxfd[:, (nfft >> 1) + sc]
-            fd[:, (nfft >> 1) - sc] = rxfd[:, (nfft >> 1) - sc]
-            fd = np.fft.fftshift(fd, axes=1)
-            td = np.fft.ifft(fd, axis=1)
+            sbs[ivhypo] = np.sum(rxfd[:, (nfft >> 1) + sc], axis=0)
 
-            sbs[ivhypo] = np.sum(np.abs(fd[:, (nfft >> 1) - sc, :] / fd[:, (nfft >> 1) + sc, :]), axis=0)
         if sys.version_info[0] == 2:
             ans = raw_input("Press enter to continue ")
         else:
             ans = input("Press enter to continue ")
-    
+
     if args.mode == 'rx':
         m = sbs / np.min(sbs)
         plt.plot(vhypos, 20 * np.log10(m))
