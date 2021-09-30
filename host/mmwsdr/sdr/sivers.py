@@ -15,6 +15,7 @@ information could be found in docs.
 import os
 import sys
 import time
+import math
 import mmwsdr
 import socket
 import numpy as np
@@ -31,8 +32,9 @@ class Sivers60GHz(object):
     """
 
     def __init__(self, ip='10.115.1.3', freq=60.48e9, unit_name='SN0240', board_type='MB1', eder_version='2',
-                 isdebug=False):
+                 isdebug=False, iscalibrated=False):
         self.ip = ip
+        self.iscalibrated = iscalibrated
         self.isdebug = isdebug
         self.sock = None
         self.fpga = None
@@ -46,6 +48,9 @@ class Sivers60GHz(object):
 
         # Establish connection with the COSMOS TCP Server.
         self.__connect()
+
+        self.cal_iq_rx_a = 1.08
+        self.cal_iq_rx_v = -0.14
 
     def __del__(self):
         self.__disconnect()
@@ -61,6 +66,20 @@ class Sivers60GHz(object):
             self.sock.sendall(b'disconnect\r\n')
             time.sleep(0.1)
             self.sock.close()
+
+    def apply_cal_rx(self, rxtd):
+        """
+
+        :param rxtd:
+        :type rxtd: np.array
+        :return:
+        :rtype:
+        """
+
+        # Apply RX IQ cal factors
+        re = (1 / self.cal_iq_rx_a) * rxtd.real
+        im = ((-1) * re * math.tan(self.cal_iq_rx_v)) + (rxtd.imag / math.cos(self.cal_iq_rx_v))
+        return re + 1j * im
 
     def send(self, txtd):
         """
@@ -86,6 +105,7 @@ class Sivers60GHz(object):
         :return: rxtd
         :rtype:
         """
+
         # Calculate the total number of samples to read:
         # (Number of batch) * (samples per batch) * (# of channel) * (I/Q)
         nsamp = nbatch * nread * self.fpga.nch * 2
@@ -100,6 +120,8 @@ class Sivers60GHz(object):
         rxtd -= np.mean(rxtd)
 
         rxtd = rxtd.reshape(nbatch, nread)
+        if self.iscalibrated:
+            rxtd = self.apply_cal_rx(rxtd)
         return rxtd
 
     @property
@@ -146,8 +168,8 @@ class Sivers60GHz(object):
         :type array_mode: str
         """
         if array_mode == 'TX':
-            self.array.run_tx_lo_leakage_cal()
             self.array.run_tx(freq=self.freq)
+            self.array.tx.dco.run()
             self.array.tx.regs.wr('tx_bb_ctrl', 0x17)
             self.array.tx.regs.wr('tx_bf_gain', 0x0e)
             self.array.tx.regs.wr('tx_rf_gain', 0x0e)
