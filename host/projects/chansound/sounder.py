@@ -19,20 +19,6 @@ if not path in sys.path:
     sys.path.append(path)
 import mmwsdr
 
-# Parameters
-naoa = 5
-nfft = 1024  # num of continuous samples per batch
-nskip = 1024  # num of samples to skip between batches
-nbatch = 5  # num of batches
-isdebug = True  # print debug messages
-sc_min = -200  # min subcarrier index
-sc_max = 200  # max subcarrier index
-tx_pwr = 20000  # transmit power
-qam = (1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j)
-
-# Find the angles of arrival
-aoa = np.linspace(-45,45,naoa)
-
 
 def main():
     """
@@ -40,6 +26,21 @@ def main():
     :return:
     :rtype:
     """
+    # Parameters
+    naoa = 5
+    nfft = 1024  # num of continuous samples per batch
+    nskip = 1024  # num of samples to skip between batches
+    nbatch = 5  # num of batches
+    isdebug = True  # print debug messages
+    iscalibrated = True  # print debug messages
+    sc_min = -200  # min subcarrier index
+    sc_max = 200  # max subcarrier index
+    tx_pwr = 15000  # transmit power
+    qam = (1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j)
+
+    # Find the angles of arrival
+    aoa = np.linspace(-45, 45, naoa)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--freq", type=float, default=60.48e9, help="receiver carrier frequency in Hz (i.e., 60.48e9)")
     parser.add_argument("--node", type=str, default='sdr2-in1', help="cosmos-sb1 node name (i.e., sdr2-in1)")
@@ -48,13 +49,15 @@ def main():
 
     # Create an SDR object and the XY table
     if args.node == 'sdr2-in1':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug)
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug,
+                                      iscalibrated=iscalibrated)
         xytable0 = mmwsdr.utils.XYTable('xytable1', isdebug=isdebug)
 
         # Move the SDR to the lower-right corner
         xytable0.move(x=0, y=0, angle=0)
     elif args.node == 'sdr2-in2':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug)
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug,
+                                      iscalibrated=iscalibrated)
         xytable0 = mmwsdr.utils.XYTable('xytable2', isdebug=isdebug)
 
         # Move the SDR to the lower-left conrner
@@ -66,44 +69,39 @@ def main():
     sdr0.fpga.configure('../../config/rfsoc.cfg')
 
     np.random.seed(0)
-    
+
     # Create a signal in frequency domain
     txfd = np.zeros((nfft,), dtype='complex')
     txfd[((nfft >> 1) + sc_min):((nfft >> 1) + sc_max)] = np.random.choice(qam, len(range(sc_min, sc_max)))
     txfd = np.fft.fftshift(txfd, axes=0)
-    
-    # Then, convert it to time domain
-    txtd = np.fft.ifft(txfd, axis=0)
 
     # Main loop
     while (1):
         if args.mode == 'tx':
+            # Then, convert it to time domain
+            txtd = np.fft.ifft(txfd, axis=0)
+
             # Set the tx power
             txtd = txtd / np.max([np.abs(txtd.real), np.abs(txtd.imag)]) * tx_pwr
 
             # Transmit data
             sdr0.send(txtd)
         elif args.mode == 'rx':
-            # Make sure that the nodes are not transmitting
-            # sdr0.send(np.zeros((nfft,), dtype='int16'))
             # Receive data
-            for iaoa in range(naoa):
-                # set AoA
-                xytable0.move(x=1300, y=0, angle=aoa[iaoa])
-                # sdr0.beam_index = iaoa
-                time.sleep(1)
+            rxtd = sdr0.recv(nfft, nskip, nbatch)
+            rxfd = np.fft.fft(rxtd, axis=1)
+            rxfd = np.fft.fftshift(rxfd, axes=1)
 
-                # Receive data
-                rxtd = sdr0.recv(nfft, nskip, nbatch)
-                rxfd = np.fft.fft(rxtd, axis=1)
-                rxfd = np.fft.fftshift(rxfd, axes=1)
+            corrfd = rxfd * np.conj(txfd)
+            corrtd = np.fft.ifft(corrfd, axis=1)
+            mag = np.abs(corrtd)
+            plt.plot(mag[0, :] / np.max(mag[0, :]))
+            plt.grid()
+            plt.show()
 
-                corrfd = rxfd * np.conj(txfd)
-                corrtd = np.fft.ifft(corrfd, axis=1)
-                mag = np.abs(corrtd)
-                for it in range(nbatch):
-                    plt.plot(mag[it,:]/np.max(mag[it,:]))
-                plt.show()
+            plt.plot(np.mean(mag, axis=0)**2/np.max(np.mean(mag, axis=0) ** 2))
+            plt.grid()
+            plt.show()
         else:
             raise ValueError("SDR mode can be either 'tx' or 'rx'")
 

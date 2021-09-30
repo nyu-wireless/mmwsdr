@@ -57,8 +57,8 @@ class Sivers60GHz(object):
         elif ip == '10.113.6.4':
             self.cal_iq_rx_a = 1.07426956483
             self.cal_iq_rx_v = -0.14
-            self.cal_iq_tx_a = 1.0
-            self.cal_iq_tx_v = 0.0
+            self.cal_iq_tx_a = 1.03169454373
+            self.cal_iq_tx_v = -0.2
         else:
             self.cal_iq_rx_a = 1.0
             self.cal_iq_rx_v = 0.0
