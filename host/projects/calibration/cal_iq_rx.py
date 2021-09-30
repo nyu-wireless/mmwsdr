@@ -27,6 +27,7 @@ def main():
     """
 
     # Parameters
+    nvhypo = 101
     nfft = 1024  # num of continuous samples per batch
     nskip = 1024 * 5  # num of samples to skip between batches
     nbatch = 100  # num of batches
@@ -109,7 +110,7 @@ def main():
 
             # Find the alpha
             a = sum_re / sum_im
-            nvhypo = 101
+
             vhypos = np.linspace(-1, 1, nvhypo)
             re = (1 / a) * rxtd.real.reshape(nbatch, nfft, 1)
             im = rxtd.real.reshape(nbatch, nfft, 1) * (-1 * np.tan(vhypos) / a) + rxtd.imag.reshape(nbatch, nfft, 1) * (
