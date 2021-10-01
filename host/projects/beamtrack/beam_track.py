@@ -30,7 +30,7 @@ def main():
     naoa = 91
     nfft = 1024  # num of continuous samples per batch
     nskip = 2*1024  # num of samples to skip between batches
-    nbatch = 100  # num of batches
+    nbatch = 5  # num of batches
     isdebug = True  # print debug messages
     iscalibrated = True  # print debug messages
     sc_min = -450  # min subcarrier index
@@ -84,6 +84,15 @@ def main():
             sdr0.send(txtd)
 
         elif args.mode == 'rx':
+            ntimes = 100
+            rxtd = np.zeros((ntimes, naoa, nbatch*nfft))
+            for it in range(ntimes):
+                for iaoa in range(naoa):
+                    sdr0.beam_index = iaoa
+                    rxtd[it, iaoa, :] = sdr0.recv(nfft*nbatch, nskip, 1)
+            rxtd = rxtd.reshape(ntimes, naoa, nbatch, nfft)
+            rxfd = np.fft.fft(rxtd, axis=3)
+            
             # In debug mode plot the impulse response
             if isdebug:
                 # Receive data
