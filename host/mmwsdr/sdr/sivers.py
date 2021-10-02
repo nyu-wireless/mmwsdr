@@ -31,39 +31,30 @@ class Sivers60GHz(object):
     Sivers60GHz class
     """
 
-    def __init__(self, ip='10.115.1.3', freq=60.48e9, unit_name='SN0240', board_type='MB1', eder_version='2',
-                 isdebug=False, iscalibrated=False):
-        self.ip = ip
+    def __init__(self, config, node='sdr2-in1', freq=60.48e9, isdebug=False, iscalibrated=False):
+        self.ip = config[node]['ip']
         self.iscalibrated = iscalibrated
         self.isdebug = isdebug
         self.sock = None
         self.fpga = None
         self.array = None
 
-        # Create the FPGA and the Array object
-        self.array = eder.Eder(init=True, unit_name=unit_name, board_type=board_type, eder_version=eder_version)
+        # Create the Array object
+        self.array = eder.Eder(init=True, unit_name=config[node]['unit_name'], board_type=config[node]['board_type'],
+                               eder_version=config[node]['eder_version'])
         self.array.check()
-        self.fpga = mmwsdr.fpga.ZCU111(ip=ip, isdebug=isdebug)
+
+        # Configure the FPGA object
+        self.fpga = mmwsdr.fpga.ZCU111(ip=self.ip, isdebug=isdebug)
         self.freq = freq
-
-        # Establish connection with the COSMOS TCP Server.
         self.__connect()
+        self.fpga.configure(os.path.join('../../config/', config['fpga']['config']))
 
-        if ip == '10.113.6.3':
-            self.cal_iq_rx_a = 1.03818588691
-            self.cal_iq_rx_v = -0.1
-            self.cal_iq_tx_a = 1.03751928222
-            self.cal_iq_tx_v = -0.4
-        elif ip == '10.113.6.4':
-            self.cal_iq_rx_a = 1.07426956483
-            self.cal_iq_rx_v = -0.14
-            self.cal_iq_tx_a = 1.03169454373
-            self.cal_iq_tx_v = -0.2
-        else:
-            self.cal_iq_rx_a = 1.0
-            self.cal_iq_rx_v = 0.0
-            self.cal_iq_tx_a = 1.0
-            self.cal_iq_tx_v = 0
+        # Load the calibration parameters
+        self.cal_iq_rx_a = config[node]['cal_iq_rx_a']
+        self.cal_iq_rx_v = config[node]['cal_iq_rx_v']
+        self.cal_iq_tx_a = config[node]['cal_iq_tx_a']
+        self.cal_iq_tx_v = config[node]['cal_iq_tx_v']
 
     def __del__(self):
         self.__disconnect()
