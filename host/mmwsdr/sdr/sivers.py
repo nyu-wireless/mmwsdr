@@ -65,7 +65,6 @@ class Sivers60GHz(object):
             self.cal_iq_tx_a = 1.0
             self.cal_iq_tx_v = 0
 
-
     def __del__(self):
         self.__disconnect()
         del self.fpga
@@ -126,22 +125,22 @@ class Sivers60GHz(object):
             txtd = self.apply_cal_tx(txtd)
         self.fpga.send(txtd)
 
-    def recv(self, nread, nskip, nbatch):
+    def recv(self, nread, nskip, nframe):
         """
 
         :param nread:
         :type nread:
         :param nskip:
         :type nskip:
-        :param nbatch:
-        :type nbatch:
+        :param nframe:
+        :type nframe:
         :return: rxtd
         :rtype:
         """
 
         # Calculate the total number of samples to read:
-        # (Number of batch) * (samples per batch) * (# of channel) * (I/Q)
-        nsamp = nbatch * nread * self.fpga.nch * 2
+        # (Number of frames) * (samples per frame) * (# of channel) * (I/Q)
+        nsamp = nframe * nread * self.fpga.nch * 2
 
         if self.mode is not 'RX':
             self.mode = 'RX'
@@ -152,7 +151,7 @@ class Sivers60GHz(object):
         # remove mean
         rxtd -= np.mean(rxtd)
 
-        rxtd = rxtd.reshape(nbatch, nread)
+        rxtd = rxtd.reshape(nframe, nread)
         if self.iscalibrated:
             rxtd = self.apply_cal_rx(rxtd)
         return rxtd

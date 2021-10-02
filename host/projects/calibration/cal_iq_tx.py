@@ -9,6 +9,8 @@ import argparse
 import numpy as np
 import matplotlib
 import math
+import configparser
+import subprocess
 
 matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
@@ -28,9 +30,9 @@ def main():
 
     # Parameters
     nvhypo = 11
-    nfft = 1024  # num of continuous samples per batch
-    nskip = 1024 * 5  # num of samples to skip between batches
-    nbatch = 100  # num of batches
+    nfft = 1024  # num of continuous samples per frame
+    nskip = 1024 * 5  # num of samples to skip between frames
+    nframe = 100  # num of frames
     isdebug = True  # print debug messages
     tx_pwr = 12000  # transmit power
     sc = 256  # tx subcarrier index
@@ -39,6 +41,9 @@ def main():
     parser.add_argument("--node", type=str, default='sdr2-in1', help="cosmos-sb1 node name (i.e., sdr2-in1)")
     parser.add_argument("--mode", type=str, default='rx', help="sdr mode (i.e., rx)")
     args = parser.parse_args()
+
+    config = configparser.ConfigParser()
+    config.read('../../config/sivers.ini')
 
     if args.mode == 'tx':
         freq = 60.48e9  # carrier frequency in Hz
@@ -49,13 +54,13 @@ def main():
 
     # Create an SDR object and the XY table
     if args.node == 'sdr2-in1':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=freq, unit_name='SN0240', isdebug=isdebug)
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.3', freq=freq, unit_name='SN0240', isdebug=isdebug)
         xytable0 = mmwsdr.utils.XYTable('xytable1', isdebug=isdebug)
 
         # Move the SDR to the lower-right corner
         xytable0.move(x=0, y=0, angle=0)
     elif args.node == 'sdr2-in2':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=freq, unit_name='SN0243', isdebug=isdebug)
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.4', freq=freq, unit_name='SN0243', isdebug=isdebug)
         xytable0 = mmwsdr.utils.XYTable('xytable2', isdebug=isdebug)
 
         # Move the SDR to the lower-left conrner
@@ -91,7 +96,7 @@ def main():
                 sdr0.send(txtd.imag)
         elif args.mode == 'rx':
             # Receive data
-            rxtd = sdr0.recv(nfft, nskip, nbatch)
+            rxtd = sdr0.recv(nfft, nskip, nframe)
             rxtd = sdr0.apply_cal_rx(rxtd)
 
             rxfd = np.fft.fft(rxtd, axis=1)
@@ -132,7 +137,7 @@ def main():
             sdr0.send(re + 1j * im)
         elif args.mode == 'rx':
             # Receive data
-            rxtd = sdr0.recv(nfft, nskip, nbatch)
+            rxtd = sdr0.recv(nfft, nskip, nframe)
             rxtd = sdr0.apply_cal_rx(rxtd)
 
             rxfd = np.fft.fft(rxtd, axis=1)

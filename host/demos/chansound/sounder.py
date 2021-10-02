@@ -7,6 +7,8 @@ import os
 import sys
 import argparse
 import time
+import configparser
+import subprocess
 
 import numpy as np
 import matplotlib
@@ -26,11 +28,12 @@ def main():
     :return:
     :rtype:
     """
+    rc = subprocess.call("../../scripts/sivers_ftdi.sh", shell=True)
     # Parameters
     naoa = 91
-    nfft = 1024  # num of continuous samples per batch
-    nskip = 2*1024  # num of samples to skip between batches
-    nbatch = 100  # num of batches
+    nfft = 1024  # num of continuous samples per frames
+    nskip = 2 * 1024  # num of samples to skip between frames
+    nframe = 100  # num of frames
     isdebug = True  # print debug messages
     iscalibrated = True  # print debug messages
     sc_min = -450  # min subcarrier index
@@ -47,16 +50,18 @@ def main():
     parser.add_argument("--mode", type=str, default='rx', help="sdr mode (i.e., rx)")
     args = parser.parse_args()
 
+    config = configparser.ConfigParser()
+    config.read('../../config/sivers.ini')
     # Create an SDR object and the XY table
     if args.node == 'sdr2-in1':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug,
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug,
                                       iscalibrated=iscalibrated)
         xytable0 = mmwsdr.utils.XYTable('xytable1', isdebug=isdebug)
 
         # Move the SDR to the lower-right corner
         xytable0.move(x=0, y=0, angle=0)
     elif args.node == 'sdr2-in2':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug,
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug,
                                       iscalibrated=iscalibrated)
         xytable0 = mmwsdr.utils.XYTable('xytable2', isdebug=isdebug)
 
@@ -87,7 +92,7 @@ def main():
             # In debug mode plot the impulse response
             if isdebug:
                 # Receive data
-                rxtd = sdr0.recv(nfft, nskip, nbatch)
+                rxtd = sdr0.recv(nfft, nskip, nframe)
 
                 # Estimate the channel
                 rxfd = np.fft.fft(rxtd, axis=1)
@@ -115,7 +120,7 @@ def main():
                 time.sleep(2)
 
                 # Receive data
-                rxtd = sdr0.recv(nfft, nskip, nbatch)
+                rxtd = sdr0.recv(nfft, nskip, nframe)
 
                 # Estimate the channel
                 rxfd = np.fft.fft(rxtd, axis=1)
@@ -123,8 +128,8 @@ def main():
                 hest = np.fft.ifft(Hest, axis=1)
 
                 # Find the position of the first peak
-                pos = np.argmax(np.abs(hest)**2, axis=1)
-                rx_pwr[iaoa] = np.sum(np.abs(hest[:,pos]))
+                pos = np.argmax(np.abs(hest) ** 2, axis=1)
+                rx_pwr[iaoa] = np.sum(np.abs(hest[:, pos]))
 
             # Normalize the received power
             rx_pwr /= np.max(rx_pwr)

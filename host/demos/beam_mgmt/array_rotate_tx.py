@@ -7,6 +7,7 @@ import os
 import sys
 import argparse
 import time
+import configparser
 
 import numpy as np
 import matplotlib
@@ -18,6 +19,7 @@ path = os.path.abspath('../../')
 if not path in sys.path:
     sys.path.append(path)
 import mmwsdr
+import subprocess
 
 # Parameters
 naod = 101
@@ -39,21 +41,24 @@ def main():
     :return:
     :rtype:
     """
+    rc = subprocess.call("../../scripts/sivers_ftdi.sh", shell=True)
     parser = argparse.ArgumentParser()
     parser.add_argument("--freq", type=float, default=60.48e9, help="receiver carrier frequency in Hz (i.e., 60.48e9)")
     parser.add_argument("--node", type=str, default='sdr2-in1', help="cosmos-sb1 node name (i.e., sdr2-in1)")
     parser.add_argument("--mode", type=str, default='rx', help="sdr mode (i.e., rx)")
     args = parser.parse_args()
 
+    config = configparser.ConfigParser()
+    config.read('../../config/sivers.ini')
     # Create an SDR object and the XY table
     if args.node == 'sdr2-in1':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug)
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug)
         xytable0 = mmwsdr.utils.XYTable('xytable1', isdebug=isdebug)
 
         # Move the SDR to the lower-right corner
         xytable0.move(x=0, y=0, angle=0)
     elif args.node == 'sdr2-in2':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug)
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug)
         xytable0 = mmwsdr.utils.XYTable('xytable2', isdebug=isdebug)
 
         # Move the SDR to the lower-left conrner

@@ -8,6 +8,8 @@ import sys
 import argparse
 import numpy as np
 import matplotlib
+import configparser
+import subprocess
 
 matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
@@ -16,7 +18,6 @@ path = os.path.abspath('../../')
 if not path in sys.path:
     sys.path.append(path)
 import mmwsdr
-import subprocess
 
 def main():
     """
@@ -27,9 +28,9 @@ def main():
     rc = subprocess.call("../../scripts/sivers_ftdi.sh", shell=True)
 
     # Parameters
-    nfft = 1024  # num of continuous samples per batch
-    nskip = 1024  # num of samples to skip between batches
-    nbatch = 5  # num of batches
+    nfft = 1024  # num of continuous samples per frame
+    nskip = 1024  # num of samples to skip between franes
+    nframe = 5  # num of frames
     iscalibrated = True  # apply rx and tx calibration factors
     isdebug = True  # print debug messages
     sc = 400  # subcarrier index
@@ -41,16 +42,19 @@ def main():
     parser.add_argument("--mode", type=str, default='rx', help="sdr mode (i.e., rx)")
     args = parser.parse_args()
 
+    config = configparser.ConfigParser()
+    config.read('../../config/sivers.ini')
+
     # Create an SDR object and the XY table
     if args.node == 'sdr2-in1':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug,
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug,
                                       iscalibrated=iscalibrated)
         xytable0 = mmwsdr.utils.XYTable('xytable1', isdebug=isdebug)
 
         # Move the SDR to the lower-right corner
         xytable0.move(x=0, y=0, angle=0)
     elif args.node == 'sdr2-in2':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug,
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.4', freq=args.freq, unit_name='SN0243', isdebug=isdebug,
                                       iscalibrated=iscalibrated)
         xytable0 = mmwsdr.utils.XYTable('xytable2', isdebug=isdebug)
 
@@ -81,13 +85,13 @@ def main():
             sdr0.send(txtd)
         elif args.mode == 'rx':
             # Receive data
-            rxtd = sdr0.recv(nfft, nskip, nbatch)
+            rxtd = sdr0.recv(nfft, nskip, nframe)
 
             rxfd = np.fft.fft(rxtd, axis=1)
             rxfd = np.fft.fftshift(rxfd, axes=1)
             f = np.linspace(-nfft / 2, nfft / 2 - 1, nfft)
-            for ibatch in range(nbatch):
-                plt.plot(f, 20*np.log10(abs(rxfd[ibatch,:])), '-')
+            for iframe in range(nframe):
+                plt.plot(f, 20*np.log10(abs(rxfd[iframe,:])), '-')
             plt.xlabel('Subcarrier index')
             plt.ylabel('Magnitude [dB]')
             plt.tight_layout()

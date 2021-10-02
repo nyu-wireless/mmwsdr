@@ -9,6 +9,8 @@ import argparse
 import numpy as np
 import matplotlib
 import math
+import configparser
+import subprocess
 
 matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
@@ -28,9 +30,9 @@ def main():
 
     # Parameters
     nvhypo = 101
-    nfft = 1024  # num of continuous samples per batch
-    nskip = 1024 * 5  # num of samples to skip between batches
-    nbatch = 100  # num of batches
+    nfft = 1024  # num of continuous samples per frame
+    nskip = 1024 * 5  # num of samples to skip between frames
+    nframe = 100  # num of frames
     isdebug = True  # print debug messages
     tx_pwr = 12000  # transmit power
 
@@ -38,6 +40,9 @@ def main():
     parser.add_argument("--node", type=str, default='sdr2-in1', help="cosmos-sb1 node name (i.e., sdr2-in1)")
     parser.add_argument("--mode", type=str, default='rx', help="sdr mode (i.e., rx)")
     args = parser.parse_args()
+
+    config = configparser.ConfigParser()
+    config.read('../../config/sivers.ini')
 
     if args.mode == 'tx':
         freq = 61.29e9  # carrier frequency in Hz
@@ -50,13 +55,13 @@ def main():
 
     # Create an SDR object and the XY table
     if args.node == 'sdr2-in1':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.3', freq=freq, unit_name='SN0240', isdebug=isdebug)
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.3', freq=freq, unit_name='SN0240', isdebug=isdebug)
         xytable0 = mmwsdr.utils.XYTable('xytable1', isdebug=isdebug)
 
         # Move the SDR to the lower-right corner
         xytable0.move(x=0, y=0, angle=0)
     elif args.node == 'sdr2-in2':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.113.6.4', freq=freq, unit_name='SN0243', isdebug=isdebug)
+        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.4', freq=freq, unit_name='SN0243', isdebug=isdebug)
         xytable0 = mmwsdr.utils.XYTable('xytable2', isdebug=isdebug)
 
         # Move the SDR to the lower-left conrner
@@ -84,11 +89,8 @@ def main():
             # Transmit data
             sdr0.send(txtd)
         elif args.mode == 'rx':
-            # Make sure that the node is not transmitting
-            # sdr0.send(np.zeros((nfft,), dtype='int16'))
-
             # Receive data
-            rxtd = sdr0.recv(nfft, nskip, nbatch)
+            rxtd = sdr0.recv(nfft, nskip, nframe)
 
             rxfd = np.fft.fft(rxtd, axis=1)
             rxfd = np.fft.fftshift(rxfd, axes=1)
@@ -99,10 +101,10 @@ def main():
 
             sum_re = 0.0
             sum_im = 0.0
-            for ibatch in range(nbatch):
+            for iframe in range(nframe):
                 fd = np.zeros((nfft,), dtype='complex')
-                fd[(nfft >> 1) + sc] = rxfd[ibatch, (nfft >> 1) + sc]
-                fd[(nfft >> 1) - sc] = rxfd[ibatch, (nfft >> 1) - sc]
+                fd[(nfft >> 1) + sc] = rxfd[iframe, (nfft >> 1) + sc]
+                fd[(nfft >> 1) - sc] = rxfd[iframe, (nfft >> 1) - sc]
                 fd = np.fft.fftshift(fd)
                 td = np.fft.ifft(fd)
                 sum_re += np.sqrt(np.mean(td.real ** 2))
@@ -112,8 +114,8 @@ def main():
             a = sum_re / sum_im
 
             vhypos = np.linspace(-1, 1, nvhypo)
-            re = (1 / a) * rxtd.real.reshape(nbatch, nfft, 1)
-            im = rxtd.real.reshape(nbatch, nfft, 1) * (-1 * np.tan(vhypos) / a) + rxtd.imag.reshape(nbatch, nfft, 1) * (
+            re = (1 / a) * rxtd.real.reshape(nframe, nfft, 1)
+            im = rxtd.real.reshape(nframe, nfft, 1) * (-1 * np.tan(vhypos) / a) + rxtd.imag.reshape(nframe, nfft, 1) * (
                     1 / np.cos(vhypos))
             td = re + 1j * im
             fd = np.fft.fft(td, axis=1)

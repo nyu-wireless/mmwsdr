@@ -26,10 +26,10 @@ class ZCU111(object):
     __nch = 1  # num of channels
     __ndac = 2  # num of D/A converters
     __nadc = 2  # num of A/D converters
-    __npar = 4  # num of parallel samples per clock cycle
+    __npar = 2  # num of parallel samples per clock cycle
     __pll = 3932.16e6  # base sample rate of the converters in Hz
-    __drate = 2  # decimation rate
-    __irate = 2  # interpolation rate
+    __drate = 4  # decimation rate
+    __irate = 4  # interpolation rate
     __max_tx_samp = 32768  # store up to 16KB of tx data
     __max_rx_samp = 1024 ** 3  # store up to 1GB of rx data
 
