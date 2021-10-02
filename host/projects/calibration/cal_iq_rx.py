@@ -34,13 +34,19 @@ def main():
     nskip = 1024 * 5  # num of samples to skip between frames
     nframe = 100  # num of frames
     isdebug = True  # print debug messages
+    iscalibrated = False  # apply rx and tx calibration factors
     tx_pwr = 12000  # transmit power
 
+    # Reload the FTDI drivers to ensure communication with the Sivers' array
+    subprocess.call("../../scripts/sivers_ftdi.sh", shell=True)
+
+    # Create an argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--node", type=str, default='sdr2-in1', help="cosmos-sb1 node name (i.e., sdr2-in1)")
-    parser.add_argument("--mode", type=str, default='rx', help="sdr mode (i.e., rx)")
+    parser.add_argument("--node", type=str, default='sdr2-in1', help="COSMOS-SB1 node name (i.e., sdr2-in1)")
+    parser.add_argument("--mode", type=str, default='rx', help="SDR mode (i.e., rx)")
     args = parser.parse_args()
 
+    # Create a configuration parser
     config = configparser.ConfigParser()
     config.read('../../config/sivers.ini')
 
@@ -53,24 +59,13 @@ def main():
     else:
         raise Exception
 
-    # Create an SDR object and the XY table
-    if args.node == 'sdr2-in1':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.3', freq=freq, unit_name='SN0240', isdebug=isdebug)
-        xytable0 = mmwsdr.utils.XYTable('xytable1', isdebug=isdebug)
-
-        # Move the SDR to the lower-right corner
-        xytable0.move(x=0, y=0, angle=0)
-    elif args.node == 'sdr2-in2':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.4', freq=freq, unit_name='SN0243', isdebug=isdebug)
-        xytable0 = mmwsdr.utils.XYTable('xytable2', isdebug=isdebug)
-
-        # Move the SDR to the lower-left conrner
-        xytable0.move(x=1300, y=0, angle=0)
-    else:
-        raise ValueError("COSMOS node can be either 'sdr2-in1' or 'sdr2-in2'")
-
-    # Configure the RFSoC
-    sdr0.fpga.configure('../../config/rfsoc.cfg')
+    # Create the SDR
+    sdr0 = mmwsdr.sdr.Sivers60GHz(config=config, node=args.node, freq=args.freq,
+                                  isdebug=isdebug, iscalibrated=iscalibrated)
+    if config[args.node]['table_name'] != None:
+        xytable0 = mmwsdr.utils.XYTable(config[args.node]['table_name'], isdebug=isdebug)
+        xytable0.move(x=int(config[args.node]['x']), y=int(config[args.node]['y']),
+                      angle=int(config[args.node]['angle']))
 
     # Main loop
     while (1):
@@ -126,25 +121,12 @@ def main():
             plt.show()
 
             v = vhypos[np.argmin(m)]
+
+            config[args.node]['cal_iq_rx_a'] = str(a)
+            config[args.node]['cal_iq_rx_v'] = str(v)
+
             print('Alpha: {}'.format(a))
             print('V: {}'.format(v))
-
-            td = rxtd[0, :]
-            re = (1 / a) * td.real
-            im = td.real * (-1 * np.tan(v) / a) + td.imag * (1 / np.cos(v))
-            td = re + 1j * im
-
-            fd = np.fft.fftshift(np.fft.fft(td))
-            fd0 = np.fft.fftshift(np.fft.fft(rxtd[0, :]))
-            plt.plot(f, np.abs(fd0))
-            plt.plot(f, np.abs(fd))
-            plt.grid()
-            plt.show()
-
-            plt.plot(f, 20 * np.log10(np.abs(fd0)))
-            plt.plot(f, 20 * np.log10(np.abs(fd)))
-            plt.grid()
-            plt.show()
         else:
             raise ValueError("SDR mode can be either 'tx' or 'rx'")
 
@@ -152,6 +134,10 @@ def main():
             ans = raw_input("Enter 'q' to exit or\n press enter to continue ")
         else:
             ans = input("Enter 'q' to exit or\n press enter to continue ")
+
+        # Update calibration parameters
+        with open('../../sivers.ini', 'w') as file:
+            config.write(file)
 
         if ans == 'q':
             break
