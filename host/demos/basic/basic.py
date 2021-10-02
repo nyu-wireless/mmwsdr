@@ -51,7 +51,8 @@ def main():
     config.read('../../config/sivers.ini')
 
     # Create the SDR
-    sdr0 = mmwsdr.sdr.Sivers60GHz(config=config, freq=args.freq, isdebug=isdebug, iscalibrated=iscalibrated)
+    sdr0 = mmwsdr.sdr.Sivers60GHz(config=config, node=args.node, freq=args.freq,
+                                  isdebug=isdebug, iscalibrated=iscalibrated)
     if config[args.node]['table_name'] != None:
         xytable0 = mmwsdr.utils.XYTable(config[args.node]['table_name'], isdebug=isdebug)
 
