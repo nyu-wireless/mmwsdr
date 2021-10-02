@@ -51,10 +51,10 @@ class Sivers60GHz(object):
         self.fpga.configure(os.path.join('../../config/', config['fpga']['config']))
 
         # Load the calibration parameters
-        self.cal_iq_rx_a = config[node]['cal_iq_rx_a']
-        self.cal_iq_rx_v = config[node]['cal_iq_rx_v']
-        self.cal_iq_tx_a = config[node]['cal_iq_tx_a']
-        self.cal_iq_tx_v = config[node]['cal_iq_tx_v']
+        self.cal_iq_rx_a = float(config[node]['cal_iq_rx_a'])
+        self.cal_iq_rx_v = float(config[node]['cal_iq_rx_v'])
+        self.cal_iq_tx_a = float(config[node]['cal_iq_tx_a'])
+        self.cal_iq_tx_v = float(config[node]['cal_iq_tx_v'])
 
     def __del__(self):
         self.__disconnect()
