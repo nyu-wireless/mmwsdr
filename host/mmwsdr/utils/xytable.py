@@ -95,8 +95,8 @@ class XYTable(object):
         """
 
         params = {'name': self.table + '.sb1.cosmos-lab.org',
-                  'x': x,
-                  'y': y,
+                  'x': int(x),
+                  'y': int(y),
                   'angle': angle}
         try:
             r = requests.get(url=self.main_url + 'move_to', params=params)

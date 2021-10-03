@@ -53,6 +53,7 @@ class Sivers60GHz(object):
                 ["ssh", "-t", "root@{}".format(node),
                  "python /root/mmwsdr/host/mmwsdr/array/ederarray.py -u {}".format(config[node]['unit_name'])],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            time.sleep(10)
 
         # Configure the carrier frequency
         self.freq = freq
