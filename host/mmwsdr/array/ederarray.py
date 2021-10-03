@@ -4,7 +4,7 @@ import argparse
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
 
-path = os.path.abspath('/root/mwwsdr/lib/ederenv/Eder_A/')
+path = os.path.abspath('/root/mmwsdr/lib/ederenv/Eder_A/')
 if path not in sys.path:
     sys.path.append(path)
 import eder

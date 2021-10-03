@@ -51,7 +51,7 @@ class Sivers60GHz(object):
         else:
             self.proc = subprocess.Popen(
                 ["ssh", "-t", "root@{}".format(node),
-                 "python /root/mmwsdr/host/mmwsdr/array/ederserver.py -u {}".format(config[node]['unit_name'])],
+                 "python /root/mmwsdr/host/mmwsdr/array/ederarray.py -u {}".format(config[node]['unit_name'])],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         # Configure the carrier frequency
