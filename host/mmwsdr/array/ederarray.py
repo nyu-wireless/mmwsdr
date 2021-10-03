@@ -4,7 +4,7 @@ import argparse
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
 
-path = os.path.abspath('../../../lib/ederenv/Eder_A/')
+path = os.path.abspath('/root/mwwsdr/lib/ederenv/Eder_A/')
 if path not in sys.path:
     sys.path.append(path)
 import eder
@@ -157,7 +157,7 @@ def main():
     :rtype:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--port', dest='port', default=8000, type=int,
+    parser.add_argument('-p', dest='port', default=8000, type=int,
                         help='HTTP server port to listen for Eder requests')
     parser.add_argument('-u', dest='unit_name', metavar='UNIT', default='SN0240',
                         help='The serial number of the MB1 unit.')
@@ -166,8 +166,8 @@ def main():
     # Create the Array Object
     array = EderArray(unit_name=args.unit_name)
 
-    # Create and start the HTTP Server
-    httpd = HTTPServer(('localhost', args.port), CreateEderHandler(array))
+    # Create and start the HTTP Server to listen on all interfaces
+    httpd = HTTPServer(('0.0.0.0', args.port), CreateEderHandler(array))
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

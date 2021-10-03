@@ -43,7 +43,7 @@ def main():
     # Create an argument parser
     parser = argparse.ArgumentParser()
     parser.add_argument("--freq", type=float, default=60.48e9, help="Carrier frequency in Hz (i.e., 60.48e9)")
-    parser.add_argument("--node", type=str, default='sdr2-in1', help="COSMOS-SB1 node name (i.e., sdr2-in1)")
+    parser.add_argument("--node", type=str, default='srv1-in1', help="COSMOS-SB1 node name (i.e., srv1-in1)")
     parser.add_argument("--mode", type=str, default='rx', help="SDR mode (i.e., rx)")
     args = parser.parse_args()
 

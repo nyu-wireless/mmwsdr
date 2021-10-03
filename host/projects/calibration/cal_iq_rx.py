@@ -140,7 +140,7 @@ def main():
             break
 
     # Update calibration parameters
-    with open('../../sivers.ini', 'w') as file:
+    with open('../../config/sivers.ini', 'w') as file:
         config.write(file)
 
     # Close the TPC connections

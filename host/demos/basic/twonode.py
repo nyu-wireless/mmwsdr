@@ -43,7 +43,7 @@ def main():
     # Create an argument parser
     parser = argparse.ArgumentParser()
     parser.add_argument("--freq", type=float, default=60.48e9, help="Carrier frequency in Hz (i.e., 60.48e9)")
-    parser.add_argument("--node", type=str, default='srv1-in1', help="COSMOS-SB1 node name (i.e., sdr2-in1)")
+    parser.add_argument("--node", type=str, default='srv1-in1', help="COSMOS-SB1 node name (i.e., srv1-in1)")
     parser.add_argument("--mode", type=str, default='rx', help="SDR mode (i.e., rx)")
     args = parser.parse_args()
 
@@ -52,21 +52,21 @@ def main():
     config.read('../../config/sivers.ini')
 
     # Create the SDR
-    sdr1 = mmwsdr.sdr.Sivers60GHz(config=config, node='sdr2-in1', freq=args.freq,
-                                  isdebug=isdebug, islocal=(args.node == 'sdr2-in1'), iscalibrated=iscalibrated)
+    sdr1 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in1', freq=args.freq,
+                                  isdebug=isdebug, islocal=(args.node == 'srv1-in1'), iscalibrated=iscalibrated)
 
-    sdr2 = mmwsdr.sdr.Sivers60GHz(config=config, node='sdr2-in2', freq=args.freq,
-                                  isdebug=isdebug, islocal=(args.node == 'sdr2-in2'), iscalibrated=iscalibrated)
+    sdr2 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in2', freq=args.freq,
+                                  isdebug=isdebug, islocal=(args.node == 'srv1-in2'), iscalibrated=iscalibrated)
 
-    if config['sdr2-in1']['table_name'] != None:
-        xytable1 = mmwsdr.utils.XYTable(config['sdr2-in1']['table_name'], isdebug=isdebug)
-        xytable1.move(x=float(config['sdr2-in1']['x']), y=float(config['sdr2-in1']['y']),
-                      angle=float(config['sdr2-in1']['angle']))
+    if config['srv1-in1']['table_name'] != None:
+        xytable1 = mmwsdr.utils.XYTable(config['srv1-in1']['table_name'], isdebug=isdebug)
+        xytable1.move(x=float(config['srv1-in1']['x']), y=float(config['srv1-in1']['y']),
+                      angle=float(config['srv1-in1']['angle']))
 
-    if config['sdr2-in2']['table_name'] != None:
-        xytable2 = mmwsdr.utils.XYTable(config['sdr2-in2']['table_name'], isdebug=isdebug)
-        xytable2.move(x=float(config['sdr2-in2']['x']), y=float(config['sdr2-in2']['y']),
-                      angle=float(config['sdr2-in2']['angle']))
+    if config['srv1-in2']['table_name'] != None:
+        xytable2 = mmwsdr.utils.XYTable(config['srv1-in2']['table_name'], isdebug=isdebug)
+        xytable2.move(x=float(config['srv1-in2']['x']), y=float(config['srv1-in2']['y']),
+                      angle=float(config['srv1-in2']['angle']))
 
     # Main experimentation loop
     while (1):
@@ -81,7 +81,7 @@ def main():
         # Set the tx power
         txtd = txtd / np.max([np.abs(txtd.real), np.abs(txtd.imag)]) * tx_pwr
 
-        if args.node == 'sdr2-in1':
+        if args.node == 'srv1-in1':
             if args.mode == 'tx':
                 sdr1.send(txtd)
                 rxtd = sdr2.recv(nfft, nskip, nframe)

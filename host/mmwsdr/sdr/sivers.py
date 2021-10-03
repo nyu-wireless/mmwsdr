@@ -33,7 +33,7 @@ class Sivers60GHz(object):
     Sivers60GHz class
     """
 
-    def __init__(self, config, node='sdr2-in1', freq=60.48e9, isdebug=False, islocal=False, iscalibrated=False):
+    def __init__(self, config, node='srv1-in2', freq=60.48e9, isdebug=False, islocal=False, iscalibrated=False):
         self.ip = config[node]['ip']
         self.iscalibrated = iscalibrated
         self.isdebug = isdebug
@@ -41,7 +41,7 @@ class Sivers60GHz(object):
         self.sock = None
         self.fpga = None
         self.array = None
-        self.main_url = 'http://{}.cosmos-lab.org:8000/'.format(node)
+        self.main_url = 'http://{}.sb1.cosmos-lab.org:8000/'.format(node)
 
         # Create the Array object
         if self.islocal:
@@ -51,8 +51,10 @@ class Sivers60GHz(object):
         else:
             self.proc = subprocess.Popen(
                 ["ssh", "-t", "root@{}".format(node),
-                 "python /root/mmwsdr/lib/ederenv/Eder_A/ederserver.py -u {}".format(config[node]['unit_name'])],
+                 "python /root/mmwsdr/host/mmwsdr/array/ederserver.py -u {}".format(config[node]['unit_name'])],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # Configure the carrier frequency
         self.freq = freq
 
         # Configure the FPGA object
