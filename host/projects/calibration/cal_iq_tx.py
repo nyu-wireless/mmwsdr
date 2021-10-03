@@ -33,6 +33,7 @@ def main():
     nfft = 1024  # num of continuous samples per frame
     nskip = 1024 * 5  # num of samples to skip between frames
     nframe = 100  # num of frames
+    iscalibrated = False  # apply rx and tx calibration factors
     isdebug = True  # print debug messages
     tx_pwr = 12000  # transmit power
     sc = 256  # tx subcarrier index
@@ -52,27 +53,15 @@ def main():
     else:
         raise ValueError("SDR mode can be either 'tx' or 'rx'")
 
-    # Create an SDR object and the XY table
-    if args.node == 'sdr2-in1':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.3', freq=freq, unit_name='SN0240', isdebug=isdebug)
-        xytable0 = mmwsdr.utils.XYTable('xytable1', isdebug=isdebug)
-
-        # Move the SDR to the lower-right corner
-        xytable0.move(x=0, y=0, angle=0)
-    elif args.node == 'sdr2-in2':
-        sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.4', freq=freq, unit_name='SN0243', isdebug=isdebug)
-        xytable0 = mmwsdr.utils.XYTable('xytable2', isdebug=isdebug)
-
-        # Move the SDR to the lower-left conrner
-        xytable0.move(x=1300, y=0, angle=0)
-    else:
-        raise ValueError("COSMOS node can be either 'sdr2-in1' or 'sdr2-in2'")
-
-    # Configure the RFSoC
-    sdr0.fpga.configure('../../config/rfsoc.cfg')
+    # Create the SDR
+    sdr0 = mmwsdr.sdr.Sivers60GHz(config=config, node=args.node, freq=freq,
+                                  isdebug=isdebug, iscalibrated=iscalibrated)
+    if config[args.node]['table_name'] != None:
+        xytable0 = mmwsdr.utils.XYTable(config[args.node]['table_name'], isdebug=isdebug)
+        xytable0.move(x=float(config[args.node]['x']), y=float(config[args.node]['y']),
+                      angle=float(config[args.node]['angle']))
 
     # Main loop
-
     if args.mode == 'tx':
         # Create a signal in frequency domain
         txfd = np.zeros((nfft,), dtype='complex')

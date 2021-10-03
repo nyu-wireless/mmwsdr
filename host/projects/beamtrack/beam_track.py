@@ -51,6 +51,7 @@ def main():
 
     config = configparser.ConfigParser()
     config.read('../../config/sivers.ini')
+
     # Create an SDR object and the XY table
     if args.node == 'sdr2-in1':
         sdr0 = mmwsdr.sdr.Sivers60GHz(ip='10.37.6.3', freq=args.freq, unit_name='SN0240', isdebug=isdebug,

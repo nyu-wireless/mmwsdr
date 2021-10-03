@@ -52,10 +52,10 @@ def main():
 
     if args.mode == 'tx':
         freq = 61.29e9  # carrier frequency in Hz
-        sc = -256  # tx subcarrier index
+        sc = -422  # tx subcarrier index
     elif args.mode == 'rx':
         freq = 60.48e9  # carrier frequency in Hz
-        sc = 166  # rx subcarrier index
+        sc = 422  # rx subcarrier index
     else:
         raise Exception
 
@@ -64,8 +64,8 @@ def main():
                                   isdebug=isdebug, iscalibrated=iscalibrated)
     if config[args.node]['table_name'] != None:
         xytable0 = mmwsdr.utils.XYTable(config[args.node]['table_name'], isdebug=isdebug)
-        xytable0.move(x=int(config[args.node]['x']), y=int(config[args.node]['y']),
-                      angle=int(config[args.node]['angle']))
+        xytable0.move(x=float(config[args.node]['x']), y=float(config[args.node]['y']),
+                      angle=float(config[args.node]['angle']))
 
     # Main loop
     while (1):
@@ -92,7 +92,7 @@ def main():
 
             f = np.linspace(-nfft / 2, nfft / 2 - 1, nfft)
 
-            print("Max subcarrier: {}".format(f[np.argmax(abs(rxfd[0, :]))]))
+            print("Max subcarrier: {}".format(int(f[np.argmax(abs(rxfd[0, :]))])))
 
             sum_re = 0.0
             sum_im = 0.0
@@ -135,12 +135,14 @@ def main():
         else:
             ans = input("Enter 'q' to exit or\n press enter to continue ")
 
-        # Update calibration parameters
-        with open('../../sivers.ini', 'w') as file:
-            config.write(file)
 
         if ans == 'q':
             break
+
+    # Update calibration parameters
+    with open('../../sivers.ini', 'w') as file:
+        config.write(file)
+
     # Close the TPC connections
     del sdr0
 

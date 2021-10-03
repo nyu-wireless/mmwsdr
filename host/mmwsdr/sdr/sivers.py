@@ -18,6 +18,8 @@ import time
 import math
 import mmwsdr
 import socket
+import requests
+import subprocess
 import numpy as np
 
 path = os.path.abspath('../../../lib/ederenv/Eder_A/')
@@ -31,22 +33,30 @@ class Sivers60GHz(object):
     Sivers60GHz class
     """
 
-    def __init__(self, config, node='sdr2-in1', freq=60.48e9, isdebug=False, iscalibrated=False):
+    def __init__(self, config, node='sdr2-in1', freq=60.48e9, isdebug=False, islocal=False, iscalibrated=False):
         self.ip = config[node]['ip']
         self.iscalibrated = iscalibrated
         self.isdebug = isdebug
+        self.islocal = islocal
         self.sock = None
         self.fpga = None
         self.array = None
+        self.main_url = 'http://{}.cosmos-lab.org:8000/'.format(node)
 
         # Create the Array object
-        self.array = eder.Eder(init=True, unit_name=config[node]['unit_name'], board_type=config[node]['board_type'],
-                               eder_version=config[node]['eder_version'])
-        self.array.check()
+        if self.islocal:
+            self.array = mmwsdr.array.EderArray(init=True, unit_name=config[node]['unit_name'],
+                                                board_type=config[node]['board_type'],
+                                                eder_version=config[node]['eder_version'])
+        else:
+            self.proc = subprocess.Popen(
+                ["ssh", "-t", "root@{}".format(node),
+                 "python /root/mmwsdr/lib/ederenv/Eder_A/ederserver.py -u {}".format(config[node]['unit_name'])],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.freq = freq
 
         # Configure the FPGA object
         self.fpga = mmwsdr.fpga.ZCU111(ip=self.ip, isdebug=isdebug)
-        self.freq = freq
         self.__connect()
         self.fpga.configure(os.path.join('../../config/', config['fpga']['config']))
 
@@ -59,7 +69,12 @@ class Sivers60GHz(object):
     def __del__(self):
         self.__disconnect()
         del self.fpga
-        del self.array
+
+        if self.islocal:
+            del self.array
+        else:
+            self.proc.terminate()
+            time.sleep(10)
 
     def __connect(self):
         self.sock = socket.create_connection((self.ip, 8083))
@@ -73,32 +88,22 @@ class Sivers60GHz(object):
             time.sleep(0.2)
             self.sock.close()
 
-    def apply_cal_tx(self, txtd):
+    def apply_iq_cal(self, td, a, v):
         """
 
-        :param rxtd:
-        :type rxtd: np.array
+        :param td:
+        :type td:
+        :param a:
+        :type a:
+        :param v:
+        :type v:
         :return:
         :rtype:
         """
 
         # Apply RX IQ cal factors
-        re = (1 / self.cal_iq_tx_a) * txtd.real
-        im = ((-1) * re * math.tan(self.cal_iq_tx_v)) + (txtd.imag / math.cos(self.cal_iq_tx_v))
-        return re + 1j * im
-
-    def apply_cal_rx(self, rxtd):
-        """
-
-        :param rxtd:
-        :type rxtd: np.array
-        :return:
-        :rtype:
-        """
-
-        # Apply RX IQ cal factors
-        re = (1 / self.cal_iq_rx_a) * rxtd.real
-        im = ((-1) * re * math.tan(self.cal_iq_rx_v)) + (rxtd.imag / math.cos(self.cal_iq_rx_v))
+        re = (1 / a) * td.real
+        im = ((-1) * re * math.tan(v)) + (td.imag / math.cos(v))
         return re + 1j * im
 
     def send(self, txtd):
@@ -113,7 +118,7 @@ class Sivers60GHz(object):
             self.mode = 'TX'
 
         if self.iscalibrated:
-            txtd = self.apply_cal_tx(txtd)
+            txtd = self.apply_iq_cal(td=txtd, a=self.cal_iq_tx_a, v=self.cal_iq_tx_v)
         self.fpga.send(txtd)
 
     def recv(self, nread, nskip, nframe):
@@ -144,7 +149,7 @@ class Sivers60GHz(object):
 
         rxtd = rxtd.reshape(nframe, nread)
         if self.iscalibrated:
-            rxtd = self.apply_cal_rx(rxtd)
+            rxtd = self.apply_iq_cal(td=rxtd, a=self.cal_iq_rx_a, v=self.cal_iq_rx_v)
         return rxtd
 
     @property
@@ -155,22 +160,25 @@ class Sivers60GHz(object):
         :return: The carrier frequency in Hz
         :rtype: float
         """
-        return self.__freq
+        return self.array.freq
 
     @freq.setter
-    def freq(self, freq):
+    def freq(self, fc):
         """
         Set the SDR carrier frequency
 
         :param freq: Carrier frequency in Hz
         :type freq: float
         """
-        self.__freq = freq
-
-        self.array.reset()
-        self.array.tx_disable()
-        self.array.rx_disable()
-        self.mode = self.array.mode
+        if self.islocal:
+            self.array.freq = fc
+        else:
+            params = {'freq': fc}
+            try:
+                r = requests.get(url=self.main_url + 'setfreq', params=params)
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                raise SystemExit(err)
 
     @property
     def mode(self):
@@ -185,22 +193,30 @@ class Sivers60GHz(object):
     @mode.setter
     def mode(self, array_mode):
         """
-        Set the Sivers' array moded
+        Set the Sivers' array mode
 
         :param array_mode: 'RX' for receive mode or TX' for transmit mode
         :type array_mode: str
         """
-        if array_mode == 'TX':
-            self.array.run_tx(freq=self.freq)
-            self.array.tx.dco.run()
-            self.array.tx.regs.wr('tx_bb_ctrl', 0x17)
-            self.array.tx.regs.wr('tx_bf_gain', 0x0e)
-            self.array.tx.regs.wr('tx_rf_gain', 0x0e)
-            self.array.tx.regs.wr('tx_bb_gain', 0x03)
-        elif array_mode == 'RX':
-            self.array.run_rx(freq=self.freq)
-            self.array.rx.dco.run()
-            self.array.rx.regs.wr('rx_bf_rf_gain', 0xee)
+        if self.islocal:
+            if array_mode == 'TX':
+                self.array.run_tx(freq=self.freq)
+                self.array.tx.dco.run()
+                self.array.tx.regs.wr('tx_bb_ctrl', 0x17)
+                self.array.tx.regs.wr('tx_bf_gain', 0x0e)
+                self.array.tx.regs.wr('tx_rf_gain', 0x0e)
+                self.array.tx.regs.wr('tx_bb_gain', 0x03)
+            elif array_mode == 'RX':
+                self.array.run_rx(freq=self.freq)
+                self.array.rx.dco.run()
+                self.array.rx.regs.wr('rx_bf_rf_gain', 0xee)
+        else:
+            params = {'mode': array_mode}
+            try:
+                r = requests.get(url=self.main_url + 'setup', params=params)
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                raise SystemExit(err)
 
     @property
     def beam_index(self):
@@ -210,7 +226,7 @@ class Sivers60GHz(object):
         :return: Index of the RX or TX BF vector (row of the RX BF AWV Table)
         :rtype: int
         """
-        return self.__beam_index
+        return self.array.beam_index
 
     @beam_index.setter
     def beam_index(self, index):
@@ -220,6 +236,12 @@ class Sivers60GHz(object):
         :param index: Index of the RX BF vector (row of the RX BF AWV Table)
         :type index: int
         """
-        self.array.tx.set_beam(index)
-        self.array.rx.set_beam(index)
-        self.__beam_index = index
+        if self.islocal:
+            self.array.beam_index = index
+        else:
+            params = {'index': index}
+            try:
+                r = requests.get(url=self.main_url + 'setbeam', params=params)
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                raise SystemExit(err)

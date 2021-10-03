@@ -33,6 +33,7 @@ def main():
     nframe = 5  # num of frames
     iscalibrated = True  # apply rx and tx calibration factors
     isdebug = True  # print debug messages
+    islocal = True
     sc = 400  # subcarrier index
     tx_pwr = 4000  # transmit power
 
@@ -52,9 +53,11 @@ def main():
 
     # Create the SDR
     sdr0 = mmwsdr.sdr.Sivers60GHz(config=config, node=args.node, freq=args.freq,
-                                  isdebug=isdebug, iscalibrated=iscalibrated)
+                                  islocal=islocal, isdebug=isdebug, iscalibrated=iscalibrated)
     if config[args.node]['table_name'] != None:
         xytable0 = mmwsdr.utils.XYTable(config[args.node]['table_name'], isdebug=isdebug)
+        xytable0.move(x=float(config[args.node]['x']), y=float(config[args.node]['y']),
+                      angle=float(config[args.node]['angle']))
 
     # Main experimentation loop
     while (1):

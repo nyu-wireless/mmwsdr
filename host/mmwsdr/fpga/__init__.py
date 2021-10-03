@@ -1,1 +1,1 @@
-from mmwsdr.fpga.zcu111 import ZCU111
+from .zcu111 import ZCU111
