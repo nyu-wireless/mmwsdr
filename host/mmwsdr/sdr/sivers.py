@@ -41,24 +41,29 @@ class Sivers60GHz(object):
         self.sock = None
         self.fpga = None
         self.array = None
+        self.mode = None
 
+        # Start a session to speed-up the HTTP requests
         self.session = requests.Session()
-        self.main_url = 'http://{}.sb1.cosmos-lab.org:8000/'.format(node)
+        self.eder_url = 'http://{}.sb1.cosmos-lab.org:8000/'.format(node)
 
         # Create the Array object
         if self.islocal:
             self.array = mmwsdr.array.EderArray(init=True, unit_name=config[node]['unit_name'],
                                                 board_type=config[node]['board_type'],
                                                 eder_version=config[node]['eder_version'])
+        """
+        The following lines make everything *very* slow. For the moment, we will start the remote server manually.
+        
         else:
             self.proc = subprocess.Popen(
                 ["ssh", "-t", "root@{}".format(node),
-                 "python /root/mmwsdr/host/mmwsdr/array/ederarray.py -u {}".format(config[node]['unit_name'])],
+                "python /root/mmwsdr/host/mmwsdr/array/ederarray.py -u {}".format(config[node]['unit_name'])],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             time.sleep(10)
+        """
 
-        # Configure the carrier frequency and sdr mode
-        self.mode = None
+        # Configure the carrier frequency
         self.freq = freq
 
         # Configure the FPGA object
@@ -183,7 +188,7 @@ class Sivers60GHz(object):
         else:
             params = {'freq': fc}
             try:
-                r = self.session.get(url=self.main_url + 'setfreq', params=params, verify=False, timeout=0.00001)
+                r = self.session.get(url=self.eder_url + 'setfreq', params=params, verify=False)
                 r.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 raise SystemExit(err)
@@ -214,7 +219,8 @@ class Sivers60GHz(object):
             if (array_mode == 'RX') | (array_mode == 'TX'):
                 params = {'mode': array_mode}
                 try:
-                    r = self.session.get(url=self.main_url + 'setup', params=params, verify=False, timeout=0.00001)
+                    r = self.session.get(url=self.eder_url + 'setup', params=params, verify=False)
+                    r.raise_for_status()
                 except requests.exceptions.HTTPError as err:
                     raise SystemExit(err)
 
@@ -241,6 +247,6 @@ class Sivers60GHz(object):
         else:
             params = {'index': index}
             try:
-                r = self.session.get(url=self.main_url + 'setbeam', params=params, verify=False, timeout=0.00001)
+                r = self.session.get(url=self.eder_url + 'setbeam', params=params, verify=False)
             except requests.exceptions.HTTPError as err:
                 raise SystemExit(err)

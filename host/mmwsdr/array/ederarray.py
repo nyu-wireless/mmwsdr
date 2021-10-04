@@ -140,6 +140,9 @@ def CreateEderHandler(array):
             elif request == 'setbeam':
                 self.array.beam_index = int(param['index'][0])
                 self.wfile.write(self.array.beam_index)
+            elif request == 'beamsweep':
+                for idx in range(64):
+                    self.array.beam_index = idx
             else:
                 self.wfile.write('Error\n')
                 return
