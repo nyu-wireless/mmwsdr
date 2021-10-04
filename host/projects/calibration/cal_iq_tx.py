@@ -35,7 +35,7 @@ def cal(sdr_tx, sdr_rx):
     sdr_rx.freq = 60.48e9
 
     # Generate the tx sequence
-    txtd = mmwsdr.utils.onetone(sc=sc, nfft=nfft) * tx_pwr
+    txtd = mmwsdr.utils.waveform.onetone(sc=sc, nfft=nfft) * tx_pwr
 
     pwr = np.zeros((2,))
     for it in range(2):
@@ -86,6 +86,8 @@ def cal(sdr_tx, sdr_rx):
         plt.xlabel('Sideband suppression [dB]')
         plt.xlabel('TX IQ quadradure phase error [rad]')
         plt.show()
+
+    return a,v
 
 
 def main():
