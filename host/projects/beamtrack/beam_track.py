@@ -48,16 +48,6 @@ def main():
 
     # Create an argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--freq", type=float, default=60.48e9, help="receiver carrier frequency in Hz (i.e., 60.48e9)")
-    parser.add_argument("--node", type=str, default='srv1-in1', help="COSMOS-SB1 node name (i.e., srv1-in1)")
-    args = parser.parse_args()
-
-    # Create a configuration parser
-    config = configparser.ConfigParser()
-    config.read('../../config/sivers.ini')
-
-    # Create an argument parser
-    parser = argparse.ArgumentParser()
     parser.add_argument("--freq", type=float, default=60.48e9, help="Carrier frequency in Hz (i.e., 60.48e9)")
     parser.add_argument("--node", type=str, default='srv1-in1', help="COSMOS-SB1 node name (i.e., srv1-in1)")
     parser.add_argument("--mode", type=str, default='rx', help="SDR mode (i.e., rx)")
@@ -109,3 +99,10 @@ def main():
 
         # Close the TPC connections
     del sdr0
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
