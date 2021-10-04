@@ -33,6 +33,7 @@ def wideband(sc_min=-100, sc_max=100, nfft=1024, mod='qam', seed=100):
 
     # Normalize the signal
     td /= np.max([np.abs(td.real), np.abs(td.imag)])
+    return td
 
 
 def onetone(sc=400, nfft=1024):
