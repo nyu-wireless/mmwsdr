@@ -21,6 +21,73 @@ if not path in sys.path:
 import mmwsdr
 
 
+def cal(sdr_tx, sdr_rx):
+    # Parameters
+    nvhypo = 101  # num of v hypothesis
+    nfft = 1024  # num of continuous samples per frame
+    nskip = 1024 * 5  # num of samples to skip between frames
+    nframe = 100  # num of frames
+    isdebug = True  # print debug messages
+    tx_pwr = 12000  # transmit power
+    sc = 422  # rx subcarrier index
+
+    sdr_tx.freq = 60.48e9
+    sdr_rx.freq = 60.48e9
+
+    # Generate the tx sequence
+    txtd = mmwsdr.utils.onetone(sc=sc, nfft=nfft) * tx_pwr
+
+    pwr = np.zeros((2,))
+    for it in range(2):
+        if it == 0:
+            sdr_tx.send(txtd.real)
+        else:
+            sdr_tx.send(txtd.imag)
+        rxtd = sdr_rx.recv(nfft, nskip, nframe)
+        rxtd = sdr_rx.apply_iq_cal(td=rxtd, a=sdr_rx.cal_iq_rx_a, v=sdr_rx.cal_iq_rx_v)
+
+        rxfd = np.fft.fft(rxtd, axis=1)
+        rxfd = np.fft.fftshift(rxfd, axes=1)
+
+        fd = np.zeros_like(rxfd)
+        fd[:, (nfft >> 1) + sc] = rxfd[:, (nfft >> 1) + sc]
+        fd[:, (nfft >> 1) - sc] = rxfd[:, (nfft >> 1) - sc]
+        fd = np.fft.fftshift(fd, axes=1)
+        td = np.fft.ifft(fd, axis=1)
+        pwr[it] = np.sum(np.sqrt(np.mean(np.abs(td) ** 2, axis=1)))
+
+    a = pwr[0] / pwr[1]
+
+    sdr_tx.freq = 61.29e9
+
+    vhypos = np.linspace(-1, 1, nvhypo)
+    sbs = np.zeros((nvhypo,))
+
+    # Calculate the v
+    for ivhypo in range(nvhypo):
+        v = vhypos[ivhypo]
+        re = (1 / a) * txtd.real
+        im = ((-1) * re * math.tan(v)) + (txtd.imag / math.cos(v))
+        sdr_tx.send(re + 1j * im)
+
+        rxtd = sdr_rx.recv(nfft, nskip, nframe)
+        rxtd = sdr_rx.apply_iq_cal(td=rxtd, a=sdr_rx.cal_iq_rx_a, v=sdr_rx.cal_iq_rx_v)
+        rxfd = np.fft.fft(rxtd, axis=1)
+        rxfd = np.fft.fftshift(rxfd, axes=1)
+        sbs[ivhypo] = np.sum(np.abs(rxfd[:, (nfft >> 1) + sc]), axis=0)
+
+    m = sbs / np.min(sbs)
+
+    v = vhypos[np.argmin(m)]
+
+    if isdebug:
+        plt.plot(vhypos, 20 * np.log10(m))
+        plt.grid()
+        plt.xlabel('Sideband suppression [dB]')
+        plt.xlabel('TX IQ quadradure phase error [rad]')
+        plt.show()
+
+
 def main():
     """
 
@@ -29,127 +96,61 @@ def main():
     """
 
     # Parameters
-    nvhypo = 11
-    nfft = 1024  # num of continuous samples per frame
-    nskip = 1024 * 5  # num of samples to skip between frames
-    nframe = 100  # num of frames
-    iscalibrated = False  # apply rx and tx calibration factors
+    nsdr = 2  # num of SDR nodes to calibrate
     isdebug = True  # print debug messages
-    tx_pwr = 12000  # transmit power
-    sc = 256  # tx subcarrier index
+    iscalibrated = False  # apply rx and tx calibration factors
 
+    # Reload the FTDI drivers to ensure communication with the Sivers' array
+    subprocess.call("../../scripts/sivers_ftdi.sh", shell=True)
+
+    # Create an argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--node", type=str, default='sdr2-in1', help="cosmos-sb1 node name (i.e., sdr2-in1)")
-    parser.add_argument("--mode", type=str, default='rx', help="sdr mode (i.e., rx)")
+    parser.add_argument("--node", type=str, default='srv1-in1', help="COSMOS-SB1 node name (i.e., srv1-in1)")
     args = parser.parse_args()
 
+    # Create a configuration parser
     config = configparser.ConfigParser()
     config.read('../../config/sivers.ini')
 
-    if args.mode == 'tx':
-        freq = 60.48e9  # carrier frequency in Hz
-    elif args.mode == 'rx':
-        freq = 60.48e9  # carrier frequency in Hz
-    else:
-        raise ValueError("SDR mode can be either 'tx' or 'rx'")
-
     # Create the SDR
-    sdr0 = mmwsdr.sdr.Sivers60GHz(config=config, node=args.node, freq=freq,
-                                  isdebug=isdebug, iscalibrated=iscalibrated)
-    if config[args.node]['table_name'] != None:
-        xytable0 = mmwsdr.utils.XYTable(config[args.node]['table_name'], isdebug=isdebug)
-        xytable0.move(x=float(config[args.node]['x']), y=float(config[args.node]['y']),
-                      angle=float(config[args.node]['angle']))
+    sdr1 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in1', freq=61.29e9,
+                                  isdebug=isdebug, islocal=(args.node == 'srv1-in1'), iscalibrated=iscalibrated)
 
-    # Main loop
-    if args.mode == 'tx':
-        # Create a signal in frequency domain
-        txfd = np.zeros((nfft,), dtype='complex')
-        txfd[(nfft >> 1) + sc] = 1
-        txfd = np.fft.fftshift(txfd, axes=0)
+    sdr2 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in2', freq=60.48e9,
+                                  isdebug=isdebug, islocal=(args.node == 'srv1-in2'), iscalibrated=iscalibrated)
 
-        # Then, convert it to time domain
-        txtd = np.fft.ifft(txfd, axis=0)
+    if config['srv1-in1']['table_name'] != None:
+        xytable1 = mmwsdr.utils.XYTable(config['srv1-in1']['table_name'], isdebug=isdebug)
+        xytable1.move(x=float(config['srv1-in1']['x']), y=float(config['srv1-in1']['y']),
+                      angle=float(config['srv1-in1']['angle']))
 
-        # Set the tx power
-        txtd = txtd / np.max([np.abs(txtd.real), np.abs(txtd.imag)]) * tx_pwr
-    sum = np.zeros((2,))
+    if config['srv1-in2']['table_name'] != None:
+        xytable2 = mmwsdr.utils.XYTable(config['srv1-in2']['table_name'], isdebug=isdebug)
+        xytable2.move(x=float(config['srv1-in2']['x']), y=float(config['srv1-in2']['y']),
+                      angle=float(config['srv1-in2']['angle']))
 
-    # Calculate the alpha
-    for it in range(2):
-        if args.mode == 'tx':
-            # Transmit data
-            if it == 0:
-                sdr0.send(txtd.real)
-            elif it == 1:
-                sdr0.send(txtd.imag)
-        elif args.mode == 'rx':
-            # Receive data
-            rxtd = sdr0.recv(nfft, nskip, nframe)
-            rxtd = sdr0.apply_cal_rx(rxtd)
+    for isdr in range(nsdr):
+        if isdr == 0:
+            a, v = cal(sdr1, sdr2)
+            config['srv1-in1']['cal_iq_rx_a'] = str(a)
+            config['srv1-in1']['cal_iq_rx_v'] = str(v)
 
-            rxfd = np.fft.fft(rxtd, axis=1)
-            rxfd = np.fft.fftshift(rxfd, axes=1)
-
-            fd = np.zeros_like(rxfd)
-            fd[:, (nfft >> 1) + sc] = rxfd[:, (nfft >> 1) + sc]
-            fd[:, (nfft >> 1) - sc] = rxfd[:, (nfft >> 1) - sc]
-            fd = np.fft.fftshift(fd, axes=1)
-            td = np.fft.ifft(fd, axis=1)
-            sum[it] = np.sum(np.sqrt(np.mean(np.abs(td) ** 2, axis=1)))
         else:
-            raise ValueError("SDR mode can be either 'tx' or 'rx'")
+            a, v = cal(sdr2, sdr1)
+            config['srv1-in2']['cal_iq_rx_a'] = str(a)
+            config['srv1-in2']['cal_iq_rx_v'] = str(v)
 
-        if sys.version_info[0] == 2:
-            ans = raw_input("Press enter to continue ")
-        else:
-            ans = input("Press enter to continue ")
-
-    if args.mode == 'tx':
-        sdr0.freq = 61.29e9
-        a = 1.03751928222
-    elif args.mode == 'rx':
-        sc = 166
-        a = sum[0] / sum[1]
-    else:
-        raise ValueError("SDR mode can be either 'tx' or 'rx'")
-
-    vhypos = np.linspace(-1, 1, nvhypo)
-    sbs = np.zeros((nvhypo,))
-
-    # Calculate the v
-    for ivhypo in range(nvhypo):
-        if args.mode == 'tx':
-            v = vhypos[ivhypo]
-            re = (1 / a) * txtd.real
-            im = ((-1) * re * math.tan(v)) + (txtd.imag / math.cos(v))
-            sdr0.send(re + 1j * im)
-        elif args.mode == 'rx':
-            # Receive data
-            rxtd = sdr0.recv(nfft, nskip, nframe)
-            rxtd = sdr0.apply_cal_rx(rxtd)
-
-            rxfd = np.fft.fft(rxtd, axis=1)
-            rxfd = np.fft.fftshift(rxfd, axes=1)
-
-            sbs[ivhypo] = np.sum(np.abs(rxfd[:, (nfft >> 1) + sc]), axis=0)
-
-        if sys.version_info[0] == 2:
-            ans = raw_input("Press enter to continue ")
-        else:
-            ans = input("Press enter to continue ")
-
-    if args.mode == 'rx':
-        m = sbs / np.min(sbs)
-        plt.plot(vhypos, 20 * np.log10(m))
-        plt.show()
-
-        v = vhypos[np.argmin(m)]
+        # Plot the parameters
         print('Alpha: {}'.format(a))
         print('V: {}'.format(v))
 
+    # Update calibration parameters
+    with open('../../config/sivers.ini', 'w') as file:
+        config.write(file)
+
     # Close the TPC connections
-    del sdr0
+    del sdr1
+    del sdr2
 
 
 if __name__ == '__main__':

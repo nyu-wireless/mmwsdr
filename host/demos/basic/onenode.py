@@ -33,9 +33,10 @@ def main():
     nframe = 5  # num of frames
     iscalibrated = True  # apply rx and tx calibration factors
     isdebug = True  # print debug messages
-    islocal = True
+    islocal = True  # Eder array is connected directly to the node over USB
     sc = 400  # subcarrier index
     tx_pwr = 4000  # transmit power
+    f = np.linspace(-nfft / 2, nfft / 2 - 1, nfft)  # subcarrier index vector for plotting
 
     # Reload the FTDI drivers to ensure communication with the Sivers' array
     subprocess.call("../../scripts/sivers_ftdi.sh", shell=True)
@@ -62,29 +63,16 @@ def main():
     # Main experimentation loop
     while (1):
         if args.mode == 'tx':
-            # Create a tone in frequency domain
-            txfd = np.zeros((nfft,), dtype='complex')
-            txfd[(nfft >> 1) + sc] = 1
-            txfd = np.fft.fftshift(txfd, axes=0)
-
-            # Then, convert it to time domain
-            txtd = np.fft.ifft(txfd, axis=0)
-
-            # Set the tx power
-            txtd = txtd / np.max([np.abs(txtd.real), np.abs(txtd.imag)]) * tx_pwr
-
-            # Transmit data
-            sdr0.send(txtd)
+            txtd = mmwsdr.utils.waveform.onetone(sc=sc, nfft=nfft) * tx_pwr  # Create a tone in frequency domain
+            sdr0.send(txtd)  # Transmit data
         elif args.mode == 'rx':
-            # Receive data
-            rxtd = sdr0.recv(nfft, nskip, nframe)
+            rxtd = sdr0.recv(nfft, nskip, nframe)  # Receive data
 
             # Convert the received data to frequncy domain
             rxfd = np.fft.fft(rxtd, axis=1)
             rxfd = np.fft.fftshift(rxfd, axes=1)
 
             # Plot the data
-            f = np.linspace(-nfft / 2, nfft / 2 - 1, nfft)
             for iframe in range(nframe):
                 plt.plot(f, 20 * np.log10(abs(rxfd[iframe, :])), '-')
             plt.xlabel('Subcarrier index')

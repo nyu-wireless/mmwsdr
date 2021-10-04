@@ -36,8 +36,7 @@ def main():
     isdebug = True  # print debug messages
     iscalibrated = False  # apply rx and tx calibration factors
     tx_pwr = 12000  # transmit power
-    sc = -422  # tx subcarrier index
-    f = np.linspace(-nfft / 2, nfft / 2 - 1, nfft)  # frequency vector
+    sc = 422  # rx subcarrier index
 
     # Reload the FTDI drivers to ensure communication with the Sivers' array
     subprocess.call("../../scripts/sivers_ftdi.sh", shell=True)
@@ -70,7 +69,7 @@ def main():
 
     # Create a signal in frequency domain
     txfd = np.zeros((nfft,), dtype='complex')
-    txfd[(nfft >> 1) + sc] = 1
+    txfd[(nfft >> 1) - sc] = 1
     txfd = np.fft.fftshift(txfd, axes=0)
 
     # Then, convert it to time domain
@@ -93,8 +92,6 @@ def main():
 
         rxfd = np.fft.fft(rxtd, axis=1)
         rxfd = np.fft.fftshift(rxfd, axes=1)
-
-        print("Max subcarrier: {}".format(int(f[np.argmax(abs(rxfd[0, :]))])))
 
         # Find the magnitude error
         fd = np.zeros((nframe, nfft), dtype='complex')
