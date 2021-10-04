@@ -163,7 +163,7 @@ class Sivers60GHz(object):
         :return: The carrier frequency in Hz
         :rtype: float
         """
-        return self.array.freq
+        return self.__freq
 
     @freq.setter
     def freq(self, fc):
@@ -173,6 +173,8 @@ class Sivers60GHz(object):
         :param freq: Carrier frequency in Hz
         :type freq: float
         """
+        self.__freq = fc
+        
         if self.islocal:
             self.array.freq = fc
         else:
@@ -191,7 +193,7 @@ class Sivers60GHz(object):
         :return: 'RX' in receive mode or TX' in transmit mode
         :rtype: str
         """
-        return self.array.mode
+        return self.__mode
 
     @mode.setter
     def mode(self, array_mode):
@@ -201,6 +203,8 @@ class Sivers60GHz(object):
         :param array_mode: 'RX' for receive mode or TX' for transmit mode
         :type array_mode: str
         """
+        self.__mode = array_mode
+
         if self.islocal:
             if array_mode == 'TX':
                 self.array.run_tx(freq=self.freq)
