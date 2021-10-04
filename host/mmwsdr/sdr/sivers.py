@@ -160,6 +160,22 @@ class Sivers60GHz(object):
             rxtd = self.apply_iq_cal(td=rxtd, a=self.cal_iq_rx_a, v=self.cal_iq_rx_v)
         return rxtd
 
+    def beamsweep(self):
+        """
+        Set the receive (RX) and transmit (TX) beamforming (BF) vectors.
+
+        :param index: Index of the RX BF vector (row of the RX BF AWV Table)
+        :type index: int
+        """
+        if self.islocal:
+            for index in range(64):
+                self.array.beam_index = index
+        else:
+            try:
+                r = self.session.get(url=self.eder_url + 'beamsweep',  verify=False)
+            except requests.exceptions.HTTPError as err:
+                raise SystemExit(err)
+
     @property
     def freq(self):
         """
