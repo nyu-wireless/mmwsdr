@@ -41,6 +41,8 @@ class Sivers60GHz(object):
         self.sock = None
         self.fpga = None
         self.array = None
+
+        self.session = requests.Session()
         self.main_url = 'http://{}.sb1.cosmos-lab.org:8000/'.format(node)
 
         # Create the Array object
@@ -55,7 +57,7 @@ class Sivers60GHz(object):
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             time.sleep(10)
 
-        # Configure the carrier frequency
+        # Configure the carrier frequency and sdr mode
         self.mode = None
         self.freq = freq
 
@@ -181,7 +183,7 @@ class Sivers60GHz(object):
         else:
             params = {'freq': fc}
             try:
-                r = requests.get(url=self.main_url + 'setfreq', params=params)
+                r = self.session.get(url=self.main_url + 'setfreq', params=params, verify=False, timeout=0.00001)
                 r.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 raise SystemExit(err)
@@ -212,8 +214,7 @@ class Sivers60GHz(object):
             if (array_mode == 'RX') | (array_mode == 'TX'):
                 params = {'mode': array_mode}
                 try:
-                    r = requests.get(url=self.main_url + 'setup', params=params)
-                    r.raise_for_status()
+                    r = self.session.get(url=self.main_url + 'setup', params=params, verify=False, timeout=0.00001)
                 except requests.exceptions.HTTPError as err:
                     raise SystemExit(err)
 
@@ -240,7 +241,6 @@ class Sivers60GHz(object):
         else:
             params = {'index': index}
             try:
-                r = requests.get(url=self.main_url + 'setbeam', params=params)
-                r.raise_for_status()
+                r = self.session.get(url=self.main_url + 'setbeam', params=params, verify=False, timeout=0.00001)
             except requests.exceptions.HTTPError as err:
                 raise SystemExit(err)
