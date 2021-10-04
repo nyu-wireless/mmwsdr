@@ -56,6 +56,7 @@ class Sivers60GHz(object):
             time.sleep(10)
 
         # Configure the carrier frequency
+        self.mode = None
         self.freq = freq
 
         # Configure the FPGA object
@@ -174,7 +175,7 @@ class Sivers60GHz(object):
         :type freq: float
         """
         self.__freq = fc
-        
+
         if self.islocal:
             self.array.freq = fc
         else:
@@ -218,12 +219,13 @@ class Sivers60GHz(object):
                 self.array.rx.dco.run()
                 self.array.rx.regs.wr('rx_bf_rf_gain', 0xee)
         else:
-            params = {'mode': array_mode}
-            try:
-                r = requests.get(url=self.main_url + 'setup', params=params)
-                r.raise_for_status()
-            except requests.exceptions.HTTPError as err:
-                raise SystemExit(err)
+            if (array_mode == 'RX') | (array_mode == 'TX'):
+                params = {'mode': array_mode}
+                try:
+                    r = requests.get(url=self.main_url + 'setup', params=params)
+                    r.raise_for_status()
+                except requests.exceptions.HTTPError as err:
+                    raise SystemExit(err)
 
     @property
     def beam_index(self):
