@@ -80,10 +80,14 @@ def main():
     txtd = txtd / np.max([np.abs(txtd.real), np.abs(txtd.imag)]) * tx_pwr
 
     for it in range(2):
-        if it == 1:
+        if it == 0:
             sdr1.send(txtd)
             rxtd = sdr2.recv(nfft, nskip, nframe)
         else:
+            # Change the carrier frequency
+            sdr1.freq = 60.48e9
+            sdr2.freq = 61.29e9
+
             sdr2.send(txtd)
             rxtd = sdr1.recv(nfft, nskip, nframe)
 

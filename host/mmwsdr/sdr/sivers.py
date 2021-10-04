@@ -83,9 +83,6 @@ class Sivers60GHz(object):
 
         if self.islocal:
             del self.array
-        else:
-            self.proc.terminate()
-            time.sleep(10)
 
     def __connect(self):
         self.sock = socket.create_connection((self.ip, 8083))
@@ -213,10 +210,10 @@ class Sivers60GHz(object):
         """
         self.__mode = array_mode
 
-        if self.islocal:
-            self.array.mode = array_mode
-        else:
-            if (array_mode == 'RX') | (array_mode == 'TX'):
+        if (array_mode == 'RX') | (array_mode == 'TX'):
+            if self.islocal:
+                self.array.mode = array_mode
+            else:
                 params = {'mode': array_mode}
                 try:
                     r = self.session.get(url=self.eder_url + 'setup', params=params, verify=False)
