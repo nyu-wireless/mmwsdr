@@ -92,8 +92,8 @@ class Sivers60GHz(object):
         if self.sock != None:
             self.sock.sendall(b'disconnect\r\n')
             time.sleep(0.2)
-            self.sock.shutdown(socket.SHUT_RDWR)
-            time.sleep(0.2)
+            # self.sock.shutdown(socket.SHUT_RDWR)
+            # time.sleep(0.2)
             self.sock.close()
 
     def apply_iq_cal(self, td, a, v):
