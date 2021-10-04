@@ -207,17 +207,7 @@ class Sivers60GHz(object):
         self.__mode = array_mode
 
         if self.islocal:
-            if array_mode == 'TX':
-                self.array.run_tx(freq=self.freq)
-                self.array.tx.dco.run()
-                self.array.tx.regs.wr('tx_bb_ctrl', 0x17)
-                self.array.tx.regs.wr('tx_bf_gain', 0x0e)
-                self.array.tx.regs.wr('tx_rf_gain', 0x0e)
-                self.array.tx.regs.wr('tx_bb_gain', 0x03)
-            elif array_mode == 'RX':
-                self.array.run_rx(freq=self.freq)
-                self.array.rx.dco.run()
-                self.array.rx.regs.wr('rx_bf_rf_gain', 0xee)
+            self.array.mode = array_mode
         else:
             if (array_mode == 'RX') | (array_mode == 'TX'):
                 params = {'mode': array_mode}
