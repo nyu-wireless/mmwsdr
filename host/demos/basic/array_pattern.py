@@ -42,28 +42,26 @@ def pttrn(sdr_tx, sdr_rx, xytable, x, y):
     sdr_tx.send(txtd*tx_pwr)
 
     # Collect the data
-    rxtd = np.zeros((naod, ncode, nframe, nfft))
+    peak = np.zeros((naod, ncode))
     for iaod in range(naod):
         print('\n-')
         xytable.move(x=x, y=y, angle=aod[iaod])
         time.sleep(1) # Wait for 1 s
+
         for icode in range(ncode):
             sys.stdout.write('.')
             sdr_rx.beam_index = icode
             time.sleep(0.1)
-            rxtd[iaod, icode] = sdr_rx.recv(nfft, nskip, nframe)
+            td = sdr_rx.recv(nfft, nskip, nframe)
+            fd = np.fft.fft(td, axis=1)
+            Hest = fd * np.conj(np.fft.fft(txtd))
+            hest = np.fft.ifft(Hest, axis=1)
+            max_peak = np.max(np.abs(hest), axis=1)
+            peak[iaod, icode] = np.sum(max_peak)
 
-    # Process the data
-    rxfd = np.fft.fft(rxtd, axis=3)
-    Hest = rxfd * np.conj(np.fft.fft(txtd))
-    hest = np.fft.ifft(Hest, axis=3)
+    pwr = np.max(peak, axis=1)
 
-    # keep only the maximum peak
-    max_peak = np.max(np.abs(hest), axis=3)
-    sum_peak = np.sum(max_peak, axis=2)
-    pwr = np.max(sum_peak, axis=1)
-
-    plt.plot(aod, 20*np.log10(pwr))
+    plt.plot(aod, 20*np.log10(pwr/np.max(pwr)))
     plt.xlabel('Angle of departure [Deg]')
     plt.ylabel('Power [dB]')
     plt.tight_layout()
