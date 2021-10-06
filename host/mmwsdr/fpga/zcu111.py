@@ -92,10 +92,10 @@ class ZCU111(object):
         This function establishes a communication link between a host and a Xilinx RFSoC device
         """
         self.sock_data = socket.create_connection((self.ip, 8082))
-        self.sock_data.settimeout(5)
+        self.sock_data.settimeout(100)
 
         self.sock_ctrl = socket.create_connection((self.ip, 8081))
-        self.sock_ctrl.settimeout(5)
+        self.sock_ctrl.settimeout(100)
 
     def __disconnect(self):
         """
@@ -168,7 +168,7 @@ class ZCU111(object):
         :return rxtd: time-domain rx signal
         :rtype rxtd:
         """
-        nbytes = 2 * nsamp # num of bytes to read
+        nbytes = 2 * nsamp  # num of bytes to read
 
         self.sock_data.sendall(b'ReadDataFromMemory 0 0 %d 0\r\n' % (nbytes))
         time.sleep(0.1)
@@ -188,6 +188,9 @@ class ZCU111(object):
         data = np.array(struct.unpack('<' + (len(tmp) >> 1) * 'h', tmp), dtype='int16')
         data = data.reshape(-1, self.npar)
         rxtd = data[::2, :] + 1j * data[1::2, :]
+
+        del data  # clear some memory
+
         rxtd = rxtd.flatten()
 
         return rxtd

@@ -160,7 +160,7 @@ class Sivers60GHz(object):
             rxtd = self.apply_iq_cal(td=rxtd, a=self.cal_iq_rx_a, v=self.cal_iq_rx_v)
         return rxtd
 
-    def beamsweep(self):
+    def beamsweep(self, start=0, stop=64, step=1):
         """
         Set the receive (RX) and transmit (TX) beamforming (BF) vectors.
 
@@ -168,11 +168,12 @@ class Sivers60GHz(object):
         :type index: int
         """
         if self.islocal:
-            for index in range(64):
-                self.array.beam_index = index
+            for index in range(start, stop, step):
+                self.array.tx.bf.awv.set(index)
         else:
+            params = {'start': start, 'stop': stop, 'step': step}
             try:
-                r = self.session.get(url=self.eder_url + 'beamsweep',  verify=False)
+                r = self.session.get(url=self.eder_url + 'beamsweep', params=params, verify=False)
             except requests.exceptions.HTTPError as err:
                 raise SystemExit(err)
 

@@ -29,15 +29,18 @@ def main():
     :rtype:
     """
     # Parameters
-    naoa = 91
+    file_id = 0  #
+    naoa = 91  #
     nfft = 1024  # num of continuous samples per frames
-    nskip = 2 * 1024  # num of samples to skip between frames
+    nskip = 100  # num of samples to skip between frames
     nframe = 20  # num of frames
-    islocal = True
+    isprocess = True  #
+    islocal = True  # True if the array is connected locally. False to connect to the Eder server
     isdebug = True  # print debug messages
     iscalibrated = True  # print debug messages
-    sc_min = -450  # min subcarrier index
-    sc_max = 450  # max subcarrier index
+    issave = True  # save the receive and transmit time domain data
+    sc_min = -250  # min subcarrier index
+    sc_max = 250  # max subcarrier index
     tx_pwr = 15000  # transmit power
 
     # Find the angles of arrival
@@ -69,23 +72,34 @@ def main():
     txtd = mmwsdr.utils.waveform.wideband(sc_min=sc_min, sc_max=sc_max, nfft=nfft)
     if args.mode == 'tx':
         sdr0.send(txtd * tx_pwr)
+
+    if issave:
+        np.savez_compressed("txtd.npz", txtd=txtd)
+
     while (1):
         if args.mode == 'tx':
-            sdr0.beamsweep()
+            try:
+                while True:
+                    sdr0.beamsweep()
+            except KeyboardInterrupt:
+                print('Received termination signal')
+                break
         elif args.mode == 'rx':
-            rxtd = sdr0.recv(nfft * nframe, nskip, 1)
-            rxtd = rxtd.reshape(nframe, nfft)
-            rxfd = np.fft.fft(rxtd, axis=1)
-            Hest = rxfd * np.conj(np.fft.fft(txtd))
-            hest = np.fft.ifft(Hest, axis=1)
+            rxtd = sdr0.recv(nfft, nskip, nframe)
 
-            t = np.arange(nfft) / sdr0.fpga.fs / 1e-9
-            plt.plot(t, 20 * np.log10(np.abs(hest[0, :]) / np.max(np.abs(hest[0, :]))))
-            plt.xlabel('Delay [ns]')
-            plt.ylabel('Magnitude [dB]')
-            plt.tight_layout()
-            plt.grid()
-            plt.show()
+            if isprocess:
+                rxfd = np.fft.fft(rxtd, axis=1)
+                Hest = rxfd * np.conj(np.fft.fft(txtd))
+                hest = np.fft.ifft(Hest, axis=1)
+
+                val = np.max(np.abs(hest) ** 2, axis=1)
+                plt.plot(20 * np.log10(val))
+                plt.grid()
+                plt.show()
+
+            if issave:
+                np.savez_compressed("rxtd_{}.npz".format(file_id), rxtd=rxtd)
+                file_id += 1
         else:
             raise ValueError("SDR mode can be either 'tx' or 'rx'")
 
