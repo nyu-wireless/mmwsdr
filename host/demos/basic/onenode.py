@@ -9,7 +9,6 @@ import argparse
 import numpy as np
 import matplotlib
 import configparser
-import subprocess
 
 matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
@@ -38,8 +37,6 @@ def main():
     tx_pwr = 4000  # transmit power
     f = np.linspace(-nfft / 2, nfft / 2 - 1, nfft)  # subcarrier index vector for plotting
 
-    # Reload the FTDI drivers to ensure communication with the Sivers' array
-    subprocess.call("../../scripts/sivers_ftdi.sh", shell=True)
 
     # Create an argument parser
     parser = argparse.ArgumentParser()

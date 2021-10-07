@@ -3,6 +3,7 @@ import sys
 import argparse
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
+import subprocess
 
 path = os.path.abspath('/root/mmwsdr/lib/ederenv/Eder_A/')
 if path not in sys.path:
@@ -27,6 +28,10 @@ class EderArray(object):
         :param eder_version:
         :type eder_version: str
         """
+
+        # Reload the FTDI drivers to ensure communication with the Sivers' array
+        subprocess.call("../../scripts/sivers_ftdi.sh", shell=True)
+
         self.array = eder.Eder(init=init, unit_name=unit_name, board_type=board_type, eder_version=eder_version)
         self.array.check()
 

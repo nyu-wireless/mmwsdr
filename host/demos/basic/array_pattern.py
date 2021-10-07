@@ -22,12 +22,14 @@ import mmwsdr
 
 
 def pttrn(sdr_tx, sdr_rx, xytable, x, y):
+    issave = True  # save the received power
+
     nfft = 1024  # num of continuous samples per frame
     nskip = 1024  # num of samples to skip between frames
     nframe = 50  # num of frames
 
-    sc_min = -400  # subcarrier index
-    sc_max = 400  # subcarrier index
+    sc_min = -250  # subcarrier index
+    sc_max = 250  # subcarrier index
     tx_pwr = 15000  # transmit power
 
     naod = 91
@@ -59,9 +61,11 @@ def pttrn(sdr_tx, sdr_rx, xytable, x, y):
             max_peak = np.max(np.abs(hest), axis=1)
             peak[iaod, icode] = np.sum(max_peak)
 
-    pwr = np.max(peak, axis=1)
+    rx_pwr = np.max(peak, axis=1)
+    if issave:
+        np.savez_compressed('array_response', rx_pwr=rx_pwr, aod=aod)
 
-    plt.plot(aod, 20*np.log10(pwr/np.max(pwr)))
+    plt.plot(aod, 20*np.log10(rx_pwr/np.max(rx_pwr)))
     plt.xlabel('Angle of departure [Deg]')
     plt.ylabel('Power [dB]')
     plt.tight_layout()
