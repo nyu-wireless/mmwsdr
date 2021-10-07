@@ -12,6 +12,7 @@
 import requests
 import xmltodict
 import json
+import cv2
 
 
 class XYTable(object):
@@ -80,6 +81,30 @@ class XYTable(object):
                 print("The target position: {}".format(self.target_position))
 
             return self.xy_status, self.rotator_status, self.current_position, self.target_position
+
+    def video(self, t=100):
+        """
+        This functions opens the video stream for t seconds
+
+        :param t: time to stream the video in seconds
+        :type t: int
+        :return:
+        :rtype:
+        """
+        if self.table == 'xytable1':
+            cap = cv2.VideoCapture('http://camera3.orbit-lab.org/mjpg/video.mjpg')
+        elif self.table == 'xytable2':
+            cap = cv2.VideoCapture('http://camera2.orbit-lab.org/mjpg/video.mjpg')
+        else:
+            raise NotImplemented
+
+        for _ in range(t):
+            frame = cap.read()[1]
+            cv2.imshow(self.table, frame)
+            cv2.waitKey(1)
+
+        cap.release()
+
 
     def move(self, x, y, angle):
         """
