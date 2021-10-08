@@ -166,7 +166,7 @@ class ZCU111(object):
         :param nsamp: num of samples to read
         :type nsamp: int
         :return rxtd: time-domain rx signal
-        :rtype rxtd:
+        :rtype rxtd: np.array
         """
         nbytes = 2 * nsamp  # num of bytes to read
 
@@ -189,15 +189,15 @@ class ZCU111(object):
         data = data.reshape(-1, self.npar)
         rxtd = data[::2, :] + 1j * data[1::2, :]
 
-        del data  # clear some memory
+        # Clear the memory
+        del tmp, data
 
-        rxtd = rxtd.flatten()
-
-        return rxtd
+        # Return 1D array
+        return rxtd.reshape(-1)
 
     def send(self, txtd):
         """
-        This class sends a buffer to the FPGA. For the moment we assume that we receive only one channel. This will be
+        This function sends a buffer to the FPGA. For the moment we assume that we receive only one channel. This will be
         extended to multiple channels
 
         :param txtd: time-domain tx signal

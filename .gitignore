@@ -1,4 +1,5 @@
 .idea
 *.swp
 *.pyc
+*.npz
 eder.info
