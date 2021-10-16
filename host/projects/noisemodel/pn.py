@@ -78,8 +78,9 @@ def main():
         sdr1.send(txtd * tx_pwr)
 
         # Receive data
-        rxtd = sdr2.recv(nfft, nskip, nframe)
-
+        rxtd = sdr2.recv(nfft*nframe, nskip, 1)
+        rxtd = rxtd.reshape(nframe, nfft)
+        
         # Estimate the channel
         rxfd = np.fft.fft(rxtd, axis=1)
         Hest = rxfd * np.conj(np.fft.fft(txtd))
