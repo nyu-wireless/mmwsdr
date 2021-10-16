@@ -97,7 +97,7 @@ def main():
                 plt.grid()
                 plt.show()
 
-                Hest = np.fft.fftshift(Hest, axis=1)
+                Hest = np.fft.fftshift(Hest, axes=1)
                 plt.imshow(np.abs(Hest.T), aspect='auto', interpolation='none')
                 plt.xlabel('Frame index')
                 plt.ylabel('Subcarrier index')
