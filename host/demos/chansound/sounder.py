@@ -5,8 +5,9 @@
 # Import Libraries
 import os
 import sys
-import argparse
 import time
+import socket
+import argparse
 import configparser
 import subprocess
 
@@ -41,10 +42,11 @@ def main():
     sc_max = 250  # max subcarrier index
     tx_pwr = 15000  # transmit power
 
+    node = socket.gethostname().split('.')[0]  # Find hostname
+
     # Create an argument parser
     parser = argparse.ArgumentParser()
     parser.add_argument("--freq", type=float, default=60.48e9, help="Carrier frequency in Hz (i.e., 60.48e9)")
-    parser.add_argument("--node", type=str, default='srv1-in1', help="COSMOS-SB1 node name (i.e., srv1-in1)")
     args = parser.parse_args()
 
     # Create a configuration parser
@@ -53,10 +55,10 @@ def main():
 
     # Create the SDR
     sdr1 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in1', freq=args.freq,
-                                  isdebug=isdebug, islocal=(args.node == 'srv1-in1'), iscalibrated=iscalibrated)
+                                  isdebug=isdebug, islocal=(node == 'srv1-in1'), iscalibrated=iscalibrated)
 
     sdr2 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in2', freq=args.freq,
-                                  isdebug=isdebug, islocal=(args.node == 'srv1-in2'), iscalibrated=iscalibrated)
+                                  isdebug=isdebug, islocal=(node == 'srv1-in2'), iscalibrated=iscalibrated)
 
     # Create the XY table controller
     if config['srv1-in1']['table_name'] != None:
