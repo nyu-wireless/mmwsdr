@@ -93,9 +93,9 @@ def main():
         plt.tight_layout()
         plt.grid()
         plt.show()
-        
+
         # Save the data
-        np.savez_compressed('pn_{}'.format(file_id), rxtd=rxtd)
+        np.savez_compressed('pn_{}'.format(file_id), txtd=txtd, rxtd=rxtd)
 
         if sys.version_info[0] == 2:
             ans = raw_input("Enter 'q' to exit or\n press enter to continue ")
@@ -104,6 +104,8 @@ def main():
 
         if ans == 'q':
             break
+
+        file_id += 1
     # Close the TPC connections
     del sdr1, sdr2
 
