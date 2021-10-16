@@ -29,23 +29,17 @@ def main():
     :rtype:
     """
     # Parameters
-    file_id = 0
-    naoa = 91
+    file_id = 0  # file id
     nfft = 1024  # num of continuous samples per frames
     nskip = 2 * 1024  # num of samples to skip between frames
     nframe = 100  # num of frames
-    issave = True
-    isprocess = True
+    issave = True  # save the received IQ samples
+    isprocess = True  # process the received IQ samples
     isdebug = True  # print debug messages
-    iscalibrated = True  # print debug messages
+    iscalibrated = True  # apply calibration parameters
     sc_min = -250  # min subcarrier index
     sc_max = 250  # max subcarrier index
     tx_pwr = 15000  # transmit power
-    qam = (1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j)
-
-    # Find the angles of arrival
-    aoa = np.linspace(-45, 45, naoa)
-
 
     # Create an argument parser
     parser = argparse.ArgumentParser()
@@ -65,6 +59,7 @@ def main():
     sdr2 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in2', freq=args.freq,
                                   isdebug=isdebug, islocal=(args.node == 'srv1-in2'), iscalibrated=iscalibrated)
 
+    # Create the XY table controller
     if config['srv1-in1']['table_name'] != None:
         xytable1 = mmwsdr.utils.XYTable(config['srv1-in1']['table_name'], isdebug=isdebug)
         xytable1.move(x=float(config['srv1-in1']['x']), y=float(config['srv1-in1']['y']),
@@ -77,13 +72,16 @@ def main():
 
     # Create the tx signal (in frequency domain)
     txtd = mmwsdr.utils.waveform.wideband(sc_min=sc_min, sc_max=sc_max, nfft=nfft)
+
     # Main loop
     while (1):
         if args.mode == 'tx':
-            sdr1.send(txtd)
+            sdr1.send(txtd*tx_pwr)
         elif args.mode == 'rx':
             # Receive data
             rxtd = sdr2.recv(nfft, nskip, nframe)
+
+            # Process the received data
             if isprocess:
                 # Estimate the channel
                 rxfd = np.fft.fft(rxtd, axis=1)
@@ -105,6 +103,7 @@ def main():
                 plt.ylabel('Subcarrier index')
                 plt.show()
 
+            # Save the data
             if issave:
                 np.savez_compressed('sounder_{}'.format(file_id), rxtd=rxtd)
         else:
