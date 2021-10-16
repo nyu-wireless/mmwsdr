@@ -45,7 +45,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--freq", type=float, default=60.48e9, help="Carrier frequency in Hz (i.e., 60.48e9)")
     parser.add_argument("--node", type=str, default='srv1-in1', help="COSMOS-SB1 node name (i.e., srv1-in1)")
-    parser.add_argument("--mode", type=str, default='rx', help="SDR mode (i.e., rx)")
     args = parser.parse_args()
 
     # Create a configuration parser
@@ -75,39 +74,37 @@ def main():
 
     # Main loop
     while (1):
-        if args.mode == 'tx':
-            sdr1.send(txtd*tx_pwr)
-        elif args.mode == 'rx':
-            # Receive data
-            rxtd = sdr2.recv(nfft, nskip, nframe)
+        # Send data
+        sdr1.send(txtd*tx_pwr)
 
-            # Process the received data
-            if isprocess:
-                # Estimate the channel
-                rxfd = np.fft.fft(rxtd, axis=1)
-                Hest = rxfd * np.conj(np.fft.fft(txtd))
-                hest = np.fft.ifft(Hest, axis=1)
+        # Receive data
+        rxtd = sdr2.recv(nfft, nskip, nframe)
 
-                t = np.arange(nfft) / sdr2.fpga.fs / 1e-9
-                plt.plot(t, 20 * np.log10(np.abs(hest[0, :]) / np.max(np.abs(hest[0, :]))))
+        # Process the received data
+        if isprocess:
+            # Estimate the channel
+            rxfd = np.fft.fft(rxtd, axis=1)
+            Hest = rxfd * np.conj(np.fft.fft(txtd))
+            hest = np.fft.ifft(Hest, axis=1)
 
-                plt.xlabel('Delay (ns)', fontsize=13)
-                plt.ylabel('Magnitude (dB)', fontsize=13)
-                plt.tight_layout()
-                plt.grid()
-                plt.show()
+            t = np.arange(nfft) / sdr2.fpga.fs / 1e-9
+            plt.plot(t, 20 * np.log10(np.abs(hest[0, :]) / np.max(np.abs(hest[0, :]))))
 
-                Hest = np.fft.fftshift(Hest, axes=1)
-                plt.imshow(np.abs(Hest.T), aspect='auto', interpolation='none')
-                plt.xlabel('Frame index')
-                plt.ylabel('Subcarrier index')
-                plt.show()
+            plt.xlabel('Delay (ns)', fontsize=13)
+            plt.ylabel('Magnitude (dB)', fontsize=13)
+            plt.tight_layout()
+            plt.grid()
+            plt.show()
 
-            # Save the data
-            if issave:
-                np.savez_compressed('sounder_{}'.format(file_id), rxtd=rxtd)
-        else:
-            raise ValueError("SDR mode can be either 'tx' or 'rx'")
+            Hest = np.fft.fftshift(Hest, axes=1)
+            plt.imshow(np.abs(Hest.T), aspect='auto', interpolation='none')
+            plt.xlabel('Frame index')
+            plt.ylabel('Subcarrier index')
+            plt.show()
+
+        # Save the data
+        if issave:
+            np.savez_compressed('sounder_{}'.format(file_id), rxtd=rxtd)
 
         if sys.version_info[0] == 2:
             ans = raw_input("Enter 'q' to exit or\n press enter to continue ")
