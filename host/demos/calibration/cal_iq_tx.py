@@ -1,5 +1,13 @@
 """
+:description: In this demo, we show the transmitter IQ calibration.
 
+:organizations: New York University
+               Pi-Radio
+
+:author: Panagiotis Skrimponis
+         Aditya Dhananjay
+
+:copyright: 2021
 """
 
 # Import Libraries
@@ -92,9 +100,7 @@ def cal(sdr_tx, sdr_rx):
 
 def main():
     """
-
-    :return:
-    :rtype:
+    Main function
     """
 
     # Parameters

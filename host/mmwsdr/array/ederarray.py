@@ -1,3 +1,7 @@
+"""
+
+:copyright: 2021
+"""
 import os
 import sys
 import argparse
@@ -13,7 +17,7 @@ import eder
 
 class EderArray(object):
     """
-
+    Eder array class
     """
 
     def __init__(self, init=True, unit_name='SN0240', board_type='MB1', eder_version='2'):
@@ -163,14 +167,12 @@ def CreateEderHandler(array):
 
 def main():
     """
-    Simple HTTP Interface to connect to the Eder Array
-    :return:
-    :rtype:
+    Simple HTTP server to connect to the Eder Array
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', dest='port', default=8000, type=int,
+    parser.add_argument('--port', dest='port', default=8000, type=int,
                         help='HTTP server port to listen for Eder requests')
-    parser.add_argument('-u', dest='unit_name', metavar='UNIT', default='SN0240',
+    parser.add_argument('--unit', dest='unit_name', metavar='UNIT', default='SN0240',
                         help='The serial number of the MB1 unit.')
     args = parser.parse_args()
 

@@ -1,7 +1,26 @@
 """
+:description: In this demo, we show a frequency-domain channel sounder at 60 GHz. We generate N_FFT symbols in
+frequency-domain. We generate a wide-band sequence filling [sc_min, sc_max] sub-carries with random 4-QAM symbols. We
+use IFFT to get the time-domain TX sequence. We transmit the data from SDR1 with cyclic repeat. We receive 100 frames
+of N_FFT data from SDR2. The user can select to save or process the data. When we process the data
 
+In this demo we control a single SDR node. We create an SDR object and an XY-Table object using the
+`mmwsdr` library. The SDR object configures and controls a Xilinx RFSoC ZCU111 eval board and a Sivers IMA transceiver
+board. A user can provide arguments to the script, such as the carrier frequency, the COSMOS node id and the transceiver
+mode. The script by default starts a local connection with a carrier frequency at 60.48 GHz in receive mode.
+
+We use two SDR devices connected
+to the same computer. We generate $N_\mathrm{FFT}$ symbols in frequency domain. We fill the $[sc_\mathrm{min}, sc_\mathrm{max}]$
+subcarriers with random 4-QAM symbols. We use IFFT to get the time-domain TX sequence. We
+transmit the data from $\mathrm{SDR}_0$ with cyclic repeat. We receive 16 frames of $N_\mathrm{FFT}$ data from $\mathrm{SDR}_1$.
+We perform correlation and plot the estimated channel impule response.
+
+
+:organization: New York University
+:author: Panagiotis Skrimponis
+
+:copyright: 2021
 """
-
 # Import Libraries
 import os
 import sys
@@ -25,9 +44,7 @@ import mmwsdr
 
 def main():
     """
-
-    :return:
-    :rtype:
+    Main function
     """
     # Parameters
     file_id = 0  # file id
@@ -38,11 +55,11 @@ def main():
     isprocess = True  # process the received IQ samples
     isdebug = True  # print debug messages
     iscalibrated = True  # apply calibration parameters
-    sc_min = -250  # min subcarrier index
-    sc_max = 250  # max subcarrier index
+    sc_min = -250  # min sub-carrier index
+    sc_max = 250  # max sub-carrier index
     tx_pwr = 15000  # transmit power
 
-    node = socket.gethostname().split('.')[0]  # Find hostname
+    node = socket.gethostname().split('.')[0]  # Find the local hostname
 
     # Create an argument parser
     parser = argparse.ArgumentParser()
@@ -53,14 +70,14 @@ def main():
     config = configparser.ConfigParser()
     config.read('../../config/sivers.ini')
 
-    # Create the SDR
+    # Create the SDR objects
     sdr1 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in1', freq=args.freq,
                                   isdebug=isdebug, islocal=(node == 'srv1-in1'), iscalibrated=iscalibrated)
 
     sdr2 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in2', freq=args.freq,
                                   isdebug=isdebug, islocal=(node == 'srv1-in2'), iscalibrated=iscalibrated)
 
-    # Create the XY table controller
+    # Create the XY table controllers. Load the default location.
     if config['srv1-in1']['table_name'] != None:
         xytable1 = mmwsdr.utils.XYTable(config['srv1-in1']['table_name'], isdebug=isdebug)
         xytable1.move(x=float(config['srv1-in1']['x']), y=float(config['srv1-in1']['y']),
@@ -71,7 +88,7 @@ def main():
         xytable2.move(x=float(config['srv1-in2']['x']), y=float(config['srv1-in2']['y']),
                       angle=float(config['srv1-in2']['angle']))
 
-    # Create the tx signal (in frequency domain)
+    # Create a wide-band tx signal
     txtd = mmwsdr.utils.waveform.wideband(sc_min=sc_min, sc_max=sc_max, nfft=nfft)
 
     # Main loop
@@ -115,7 +132,8 @@ def main():
 
         if ans == 'q':
             break
-    # Close the TPC connections
+
+    # Delete the SDR object. Close the TCP connections.
     del sdr1, sdr2
 
 

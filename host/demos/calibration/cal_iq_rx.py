@@ -1,5 +1,13 @@
 """
+:description:
 
+:organizations: New York University
+               Pi-Radio
+
+:author: Panagiotis Skrimponis
+         Aditya Dhananjay
+
+:copyright: 2021
 """
 
 # Import Libraries
@@ -8,7 +16,7 @@ import sys
 import argparse
 import numpy as np
 import matplotlib
-import math
+import socket
 import configparser
 import subprocess
 
@@ -23,9 +31,7 @@ import mmwsdr
 
 def main():
     """
-
-    :return:
-    :rtype:
+    Main function
     """
 
     # Parameters
@@ -36,26 +42,29 @@ def main():
     isdebug = True  # print debug messages
     iscalibrated = False  # apply rx and tx calibration factors
     tx_pwr = 12000  # transmit power
-    sc = 422  # rx subcarrier index
+    sc = 422  # rx sub-carrier index
 
     # Reload the FTDI drivers to ensure communication with the Sivers' array
     subprocess.call("../../scripts/sivers_ftdi.sh", shell=True)
 
     # Create an argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--node", type=str, default='srv1-in1', help="COSMOS-SB1 node name (i.e., srv1-in1)")
+    parser.add_argument("--freq", type=float, default=60.48e9, help="Carrier frequency in Hz (i.e., 60.48e9)")
     args = parser.parse_args()
 
     # Create a configuration parser
     config = configparser.ConfigParser()
     config.read('../../config/sivers.ini')
 
-    # Create the SDR
-    sdr1 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in1', freq=61.29e9,
-                                  isdebug=isdebug, islocal=(args.node == 'srv1-in1'), iscalibrated=iscalibrated)
+    # Find the COSMOS node id
+    node = socket.gethostname().split('.')[0]
 
-    sdr2 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in2', freq=60.48e9,
-                                  isdebug=isdebug, islocal=(args.node == 'srv1-in2'), iscalibrated=iscalibrated)
+    # Create the SDR
+    sdr1 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in1', freq=args.freq + 0.81e9,
+                                  isdebug=isdebug, islocal=(node == 'srv1-in1'), iscalibrated=iscalibrated)
+
+    sdr2 = mmwsdr.sdr.Sivers60GHz(config=config, node='srv1-in2', freq=args.freq,
+                                  isdebug=isdebug, islocal=(node == 'srv1-in2'), iscalibrated=iscalibrated)
 
     if config['srv1-in1']['table_name'] != None:
         xytable1 = mmwsdr.utils.XYTable(config['srv1-in1']['table_name'], isdebug=isdebug)
@@ -84,8 +93,8 @@ def main():
             rxtd = sdr2.recv(nfft, nskip, nframe)
         else:
             # Change the carrier frequency
-            sdr1.freq = 60.48e9
-            sdr2.freq = 61.29e9
+            sdr1.freq = args.freq
+            sdr2.freq = args.freq + 0.81e9
 
             sdr2.send(txtd)
             rxtd = sdr1.recv(nfft, nskip, nframe)
@@ -107,7 +116,7 @@ def main():
         vhypos = np.linspace(-1, 1, nvhypo)
         re = (1 / a) * rxtd.real.reshape(nframe, nfft, 1)
         im = rxtd.real.reshape(nframe, nfft, 1) * (-1 * np.tan(vhypos) / a) + rxtd.imag.reshape(nframe, nfft, 1) * (
-                    1 / np.cos(vhypos))
+                1 / np.cos(vhypos))
         td = re + 1j * im
         fd = np.fft.fft(td, axis=1)
         fd = np.fft.fftshift(fd, axes=1)
@@ -130,7 +139,7 @@ def main():
             plt.plot(vhypos, 20 * np.log10(m))
             plt.grid()
             plt.xlabel('Sideband suppression [dB]')
-            plt.xlabel('RX IQ quadradure phase error [rad]')
+            plt.xlabel('RX IQ quadrature phase error [rad]')
             plt.show()
 
     # Update calibration parameters
