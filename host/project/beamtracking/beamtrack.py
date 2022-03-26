@@ -33,10 +33,10 @@ def main():
     # Parameters
     file_id = 0  # file id
     nfft = 1024  # num of continuous samples per frames
-    nskip = 2 * 1024  # num of samples to skip between frames
-    nframe = 20  # num of frames
+    nskip = 1 * 1024  # num of samples to skip between frames
+    nframe = 32  # num of frames
     issave = True  # save the received IQ samples
-    isdebug = True  # print debug messages
+    isdebug = False  # print debug messages
     iscalibrated = True  # apply calibration parameters
     sc_min = -250  # min sub-carrier index
     sc_max = 250  # max sub-carrier index
@@ -77,25 +77,34 @@ def main():
     # Step 1. Tx send sequence (cyclic rotation)
     sdr1.send(txtd*tx_pwr)
 
-    x = np.arange(1300);
-    y = np.arange(1300);
-    angle = np.zeros(1300);
+    x = np.random.randint(low = 0, high = 1300, size = (512,))
+    y = np.random.randint(low = 0, high = 1300, size = (512,))
+    angle = np.random.randint(low = -45, high = 45, size = (512,))
     # Main loop
+    data = []
     while (1):
-        for loc in range(2):
-            # Step 2. Send Rx 
+        for loc in range(8):
+            # Step 2. Moce Rx to location (x_i, y_i, a_i)
             xytable2.move(x=x[loc], y=y[loc], angle=angle[loc])
-            print(f"Wait for Rx to reach location ({x[loc]}, {y[loc]}, {angle[loc]})")
             time.sleep(5);
-            for beam_index in range(0,64,4):
-                sdr1.set_beam(beam_index)
+            for beam_index in [0,8,16,24,32,50,48,56,63]:
+                sdr1.beam_index = beam_index
+                time.sleep(2)
 
-        # Receive data
-        rxtd = sdr2.recv(nfft, nskip, nframe)
-        rxfd = np.fft.fft(rxtd, axis=1)
-        Hest = rxfd * np.conj(np.fft.fft(txtd))
-        hest = np.fft.ifft(Hest, axis=1)
-        snr = 20 * np.log10(np.max(np.abs(hest[0, :])))
+                # Receive data
+                rxtd = sdr2.recv(nfft, nskip, nframe)
+                rxfd = np.fft.fft(rxtd, axis=1)
+                Hest = rxfd * np.conj(np.fft.fft(txtd))
+                hest = np.fft.ifft(Hest, axis=1)
+                pdp = 20 * np.log10(np.abs(hest))
+                sig_max = np.max(pdp, axis=1)
+                sig_avg = np.mean(pdp, axis=1)
+                snr = np.mean(sig_max - sig_avg)
+                print("X: {:3d}, Y: {:3d}, A: {:2d}, BF {:2d}, SNR: {:2.2f} dB".format(x[loc], y[loc], angle[loc], beam_index, snr))
+                data.append([x[loc], y[loc], angle[loc], beam_index, snr])
+
+        A = np.array(data)
+        print(A.shape)
 
         if sys.version_info[0] == 2:
             ans = raw_input("Enter 'q' to exit or\n press enter to continue ")
