@@ -35,12 +35,13 @@ def main():
     nfft = 1024  # num of continuous samples per frames
     nskip = 1 * 1024  # num of samples to skip between frames
     nframe = 32  # num of frames
-    issave = True  # save the received IQ samples
+    issave = False  # save the received IQ samples
     isdebug = False  # print debug messages
     iscalibrated = True  # apply calibration parameters
     sc_min = -250  # min sub-carrier index
     sc_max = 250  # max sub-carrier index
-    tx_pwr = 15000  # transmit power
+    tx_pwr = 12000  # transmit power
+    file_id = 0
 
     node = socket.gethostname().split('.')[0]  # Find the local hostname
 
@@ -77,18 +78,22 @@ def main():
     # Step 1. Tx send sequence (cyclic rotation)
     sdr1.send(txtd*tx_pwr)
 
-    x = np.random.randint(low = 0, high = 1300, size = (512,))
-    y = np.random.randint(low = 0, high = 1300, size = (512,))
-    angle = np.random.randint(low = -45, high = 45, size = (512,))
+    x = np.random.randint(low = 0, high = 1300, size = (1024,))
+    y = np.random.randint(low = 0, high = 1300, size = (1024,))
+    # angle = np.random.randint(low = -45, high = 45, size = (512,))
+    # angle = np.random.randint(low = -1, high = 2, size=(1024,))*45
+    angle = np.random.choice((-45, -22.5, 0, 22.5, 45), (1024,))
     # Main loop
     data = []
     while (1):
-        for loc in range(8):
+        for loc in range(1024):
             # Step 2. Moce Rx to location (x_i, y_i, a_i)
+            print("({:4d}) X: {:4d}, Y: {:4d}, A: {:2f}".format(loc,x[loc],y[loc],angle[loc]))
+            
             xytable2.move(x=x[loc], y=y[loc], angle=angle[loc])
-            time.sleep(5);
-            for beam_index in [0,8,16,24,32,50,48,56,63]:
-                sdr1.beam_index = beam_index
+            time.sleep(4)
+            for beam_index in [0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,63]:
+                sdr2.beam_index = beam_index
                 time.sleep(2)
 
                 # Receive data
@@ -100,12 +105,12 @@ def main():
                 sig_max = np.max(pdp, axis=1)
                 sig_avg = np.mean(pdp, axis=1)
                 snr = np.mean(sig_max - sig_avg)
-                print("X: {:3d}, Y: {:3d}, A: {:2d}, BF {:2d}, SNR: {:2.2f} dB".format(x[loc], y[loc], angle[loc], beam_index, snr))
                 data.append([x[loc], y[loc], angle[loc], beam_index, snr])
 
-        A = np.array(data)
-        print(A.shape)
+        data = np.array(data)
+        # snr = data[:,-1].reshape(1024,-1)
 
+        np.savez_compressed('beamtracking_data_{}'.format(file_id), data=data)
         if sys.version_info[0] == 2:
             ans = raw_input("Enter 'q' to exit or\n press enter to continue ")
         else:
@@ -113,6 +118,8 @@ def main():
 
         if ans == 'q':
             break
+        else:
+            file_id += 1
 
     # Delete the SDR object. Close the TCP connections.
     del sdr1, sdr2
