@@ -33,13 +33,13 @@ def main():
     # Parameters
     file_id = 0  # file id
     nfft = 1024  # num of continuous samples per frames
-    nskip = 1 * 1024  # num of samples to skip between frames
-    nframe = 32  # num of frames
+    nskip = 1024  # num of samples to skip between frames
+    nframe = 16  # num of frames
     issave = False  # save the received IQ samples
     isdebug = False  # print debug messages
     iscalibrated = True  # apply calibration parameters
-    sc_min = -250  # min sub-carrier index
-    sc_max = 250  # max sub-carrier index
+    sc_min = -400  # min sub-carrier index
+    sc_max = 400  # max sub-carrier index
     tx_pwr = 12000  # transmit power
     file_id = 0
 
@@ -78,37 +78,42 @@ def main():
     # Step 1. Tx send sequence (cyclic rotation)
     sdr1.send(txtd*tx_pwr)
 
-    x = np.random.randint(low = 0, high = 1300, size = (1024,))
-    y = np.random.randint(low = 0, high = 1300, size = (1024,))
-    # angle = np.random.randint(low = -45, high = 45, size = (512,))
-    # angle = np.random.randint(low = -1, high = 2, size=(1024,))*45
-    angle = np.random.choice((-45, -22.5, 0, 22.5, 45), (1024,))
+    x_test = np.linspace(0, 1300, 14, dtype=int);
+    y_test = np.linspace(0, 1300, 14, dtype=int);
+    angle_test = np.linspace(-45, 45, 7)
+
+
+    # Move TX at the center facing at 0 deg
+    xytable1.move(x=650, y=650, angle=0)
+
     # Main loop
     data = []
-    while (1):
-        for loc in range(1024):
-            # Step 2. Moce Rx to location (x_i, y_i, a_i)
-            print("({:4d}) X: {:4d}, Y: {:4d}, A: {:2f}".format(loc,x[loc],y[loc],angle[loc]))
-            
-            xytable2.move(x=x[loc], y=y[loc], angle=angle[loc])
-            time.sleep(4)
-            for beam_index in [0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,63]:
-                sdr2.beam_index = beam_index
-                time.sleep(2)
 
-                # Receive data
-                rxtd = sdr2.recv(nfft, nskip, nframe)
-                rxfd = np.fft.fft(rxtd, axis=1)
-                Hest = rxfd * np.conj(np.fft.fft(txtd))
-                hest = np.fft.ifft(Hest, axis=1)
-                pdp = 20 * np.log10(np.abs(hest))
-                sig_max = np.max(pdp, axis=1)
-                sig_avg = np.mean(pdp, axis=1)
-                snr = np.mean(sig_max - sig_avg)
-                data.append([x[loc], y[loc], angle[loc], beam_index, snr])
+    while (1):
+        loc = 0
+        for x in x_test:
+            for y in y_test:
+                for angle in angle_test:
+                    print("({:4d}) X: {:4d}, Y: {:4d}, A: {:2f}".format(loc, x, y, angle))
+                    loc = loc + 1
+                    xytable2.move(x, y, angle)
+                    time.sleep(2)
+                    for beam_index in [1, 5, 9, 13, 17, 21, 25, 29, 32, 35, 39, 43, 47, 51, 55, 59, 63]:
+                        sdr2.beam_index = beam_index
+                        time.sleep(1)
+
+                        # Receive data
+                        rxtd = sdr2.recv(nfft, nskip, nframe)
+                        rxfd = np.fft.fft(rxtd, axis=1)
+                        Hest = rxfd * np.conj(np.fft.fft(txtd))
+                        hest = np.fft.ifft(Hest, axis=1)
+                        pdp = 20 * np.log10(np.abs(hest))
+                        sig_max = np.max(pdp, axis=1)
+                        sig_avg = np.mean(pdp, axis=1)
+                        snr = np.mean(sig_max - sig_avg)
+                        data.append([x, y, angle, beam_index, snr])
 
         data = np.array(data)
-        # snr = data[:,-1].reshape(1024,-1)
 
         np.savez_compressed('beamtracking_data_{}'.format(file_id), data=data)
         if sys.version_info[0] == 2:
