@@ -93,18 +93,28 @@ Navigate to /home/xilinx/jupyter_notebooks/mmwsdr and upload & replace the follo
 
 ## 3. Run the testbed
 
-You are finally ready to launch your experiments! 
+You are finally ready to launch your experiments. First of all, make sure the host computer is on the same network as the 2x2 boards. 
+```
+sudo ifconfig eno1 10.1.1.100 netmask 255.255.255.0 up
+```
+Ping the TX (10.1.1.40) and RX (10.1.1.30) to verify full connectivity among all the devices. 
 
-> Run the transmitter FIRST (10.1.1.40)
-$ ssh xilinx@10.1.1.40 password: xilinx
-$ ping 10.1.1.40
-$ python tx.py
+Then, launch SSH to connect to the TX and the RX (either via terminal or using VS). 
 
-To check: Does it matter whether to start Tx or Rx first?
-To check: Red LEDs on the Tx board USB port?
+From the TX, launch the python script that enables transmission of samples:
+```
+python tx.py
+```
 
+Then, from the RX, launch the python script that enables the capture of the transmitted samples:
 
-> Run the receiver (10.1.1.30). 
-$ ssh xilinx@10.1.1.30 password: xilinx
-$ ping 10.1.1.30
-$ python rx.py
+```
+python rx.py
+```
+
+The rx.py script will save the received IQ samples in .txt and .csv formats. Transfer these files to the host computer using these commands:
+```
+scp xilinx@10.1.1.30:/home/xilinx/hest.csv /home/ubuntu/Downloads/
+scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
+```
+
