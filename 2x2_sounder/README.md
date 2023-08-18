@@ -14,11 +14,11 @@ Carefully follow each step described in the HW_setup.pdf document. You will lear
 
 ## 2. Program the testbed
 
-### 2.1. Download the rx.img
+**Download the rx.img**
 
 It is preferable to use Google Chrome. Other browsers might have a problem with big files. Click [here](https://drive.google.com/file/d/1YfHpmMC5HQftU6drCumDuZgqWMh2dPdv/view?usp=drive_link) to download it.
 
-### 2.2. Burn the rx.img to both SD Cards
+**Burn the rx.img to both SD Cards**
 
 In Linux we can do the following. Insert the SD card in the computer, and run:
 
@@ -51,7 +51,7 @@ In OSX, you can use terminal comments.
 More information can be found at https://pynq.readthedocs.io/en/latest/appendix/sdcard.html. 
 
 
-### 2.3. Configure the right static IP address on the TX 
+**Configure the right static IP address on the TX **
 
 The image will have a static IP address of 10.1.1.30. We will use this address for the RX. 
 
@@ -62,7 +62,7 @@ Hence, for the TX, we have to change it. To do so, please follow these steps:
  3) Edit the /etc/network/interfaces.d/eth0 and modify the address. Let's set the TX to 10.1.1.40;
  4) Safely unmount the drive.
 
-### 2.4. Configure the right static IP address on the Host Computer
+**Configure the right static IP address on the Host Computer**
 
 Connect the switch to an host computer with an Ethernet cable, then set a static IP address:
 
@@ -76,7 +76,7 @@ sudo ifconfig eno1 10.1.1.100 netmask 255.255.255.0 up
 
 Unplug and replug if ping either the TX (10.1.1.40) or the RX (10.1.1.30) fails.
 
-### 2.5. SSH into the TX and RX and replace the scripts
+**SSH into the TX and RX and replace the scripts**
 
 I recommend using Visual Studio to visually access the content of each board. You will have two VS instances running, one for the TX and one for the RX. 
 
