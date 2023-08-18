@@ -10,7 +10,7 @@ Instructions to build, set up and run the 60 GHz Channel Sounder developed by No
 
 ## 1. Build the testbed
 
-Carefully follow each step described in the HW_setup.pdf document. You will learn how to connect the Sivers arrays (TX and RX) to the RFSoC 2x2 boards through the Broadband balun model Merkei BAL0006. 
+Carefully follow each step described in the [HW setup](https://github.com/nyu-wireless/mmwsdr/blob/main/2x2_sounder/HW_setup.pdf) document. You will learn how to connect the Sivers arrays (TX and RX) to the RFSoC 2x2 boards through the Broadband balun model Merkei BAL0006. 
 
 ## 2. Program the testbed
 
