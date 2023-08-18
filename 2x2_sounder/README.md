@@ -32,6 +32,7 @@ sudo fdisk -l
 
 The SD card we need to flash should show something like this:
 
+```
 Disk /dev/sdd: 14.84 GiB, 15931539456 bytes, 31116288 sectors
 Disk model: USB3.0 CRW   -SD
 Units: sectors of 1 * 512 = 512 bytes
@@ -39,10 +40,9 @@ Sector size (logical/physical): 512 bytes / 512 bytes
 I/O size (minimum/optimal): 512 bytes / 512 bytes
 Disklabel type: dos
 Disk identifier: 0xbc7f45e1
+```
 
-You may see /dev/sdb/ or other letters. That's ok. 
-
-You are ready to flash it. 
+You may see /dev/sdb/ or other letters. That's ok. You are ready to flash it. 
 
 ```
 sudo dd if=~/Downloads/rx.img of=/dev/sdd 
