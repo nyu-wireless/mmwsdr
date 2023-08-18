@@ -1,10 +1,8 @@
-Instructions to build, set up and run the 2x2 60 GHz Channel Sounder developed by Notis. 
+Instructions to build, set up and run the 60 GHz Channel Sounder developed by Notis. 
 
 # Table of Contents  
 
 [1. Build](#1-build-the-testbed)
-
-Download this document and follow 
 
 [2. Program](#2-program-the-testbed)
 
@@ -12,27 +10,13 @@ Download this document and follow
 
 ## 1. Build the testbed
 
-### 1.1 Set up the receiver
-
-Let us start setting up the Sivers antenna array. We highly recommend to use different colors for each cable. In this setup, we have: 
-
-RX_QP (brown)
-RX_QN (red)
-RX_IN (purple)
-RX_IP (turquoise)
-
-
-
-
-### 1.2 Set up the transmitter
-
-dsdsassadf
+Carefully follow each step described in the HW_setup.pdf document. You will learn how to connect the Sivers arrays (TX and RX) to the RFSoC 2x2 boards through the Broadband balun model Merkei BAL0006. 
 
 ## 2. Program the testbed
 
-> Download the rx.img
-I would recommend using google chrome. Other browsers might have a problem with big files.
-% rx.img has been verified by Notis and Mingsheng, should be ok.
+## 2.1. Download the rx.img
+
+It is preferable to use google chrome. Other browsers might have a problem with big files. Click [here](https://drive.google.com/file/d/1YfHpmMC5HQftU6drCumDuZgqWMh2dPdv/view?usp=drive_link).
 
 > Burn the rx.img to both SD Cards
 
