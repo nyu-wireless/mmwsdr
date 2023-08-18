@@ -55,7 +55,7 @@ In OSX, you can use terminal comments.
 More information can be found at https://pynq.readthedocs.io/en/latest/appendix/sdcard.html. 
 
 
-**Configure the right static IP address on the TX **
+**Configure the right static IP address on the TX**
 
 The image will have a static IP address of 10.1.1.30. We will use this address for the RX. 
 
@@ -68,11 +68,7 @@ Hence, for the TX, we have to change it. To do so, please follow these steps:
 
 **Configure the right static IP address on the Host Computer**
 
-Connect the switch to an host computer with an Ethernet cable, then set a static IP address:
-
-IP 10.1.1.100, netmask 255.255.255.0
-
-In our case, the interface is named eno1. Use this command: 
+Connect the switch to an host computer with an Ethernet cable, then set a static IP address (in our case the interface is named eno1). 
 
 ```
 sudo ifconfig eno1 10.1.1.100 netmask 255.255.255.0 up
