@@ -1,5 +1,9 @@
 Instructions to build, set up and run the 60 GHz Channel Sounder developed by Notis. 
 
+
+![IMG_8906](https://github.com/nyu-wireless/mmwsdr/assets/24817896/346ab6a4-8d33-41a2-9502-7f0f18a02c76)
+
+
 # Table of Contents  
 
 [1. Build](#1-build-the-testbed)
