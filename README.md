@@ -6,7 +6,7 @@ for advanced wireless software defined radios (SDRs).  The repository is under c
 
 ## FPGA Tutorials
 * [Installing the FPGA tools](./tutorial/installfpgatools.md)
-* Remotely logging into the FPGA server
+* [Remotely logging into the NYU Wireless FPGA server](./tutorial/login.md)
 * Connecting the Sivers array
 * Demo:  Simple FPGA adder
 
