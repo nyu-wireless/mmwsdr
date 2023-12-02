@@ -1,5 +1,30 @@
 # Lesson 2:
 
+## Setting up connection to RFSoC to open Jupyter notebook on browser
+As mentioned in Lesson 0.1 the RFSoC contains 2 key processing elements, i.e a Processing System (PS,which has an operating system) and Programmable Logic (PL,which has an FPGA Image and some bitstream file in it). This system is connected to the workstation that runs Linux. We use said workstation system to connect to and control the board.
+
+Usually the flow of data is as follows:
+
+Processing System ↔ Progammable Logic ↔ RF Front End
+Where, data originates from the Processing System for the Transmitter Configuration and as for the Receiver Configuration it’s the reverse where data origination is from the RF Front End.
+The following section explains the method to connect to the PS and program on the same.
+
+### Connecting to the board
+
+Once the boot sequence is finished, the board can be accessed with a browser. On the URL bar type
+
+https:192.168.3.1:9090/lab
+
+This is the default IP Address of a 2x2 board. The /lab part gives us access to the entire Jupyter lab instead of just the notebook, thus providing extra features such as a terminal.
+
+Once the URL is entered Jupyter lab opens with certain getting started files and example files. These files contain PYNQ examples such as Spectrum Analyser where the user can transmit a tone at a certain frequency from the 2x2 board and receive a certain band on the same board 2x2. The received and sampled signals are processed to give a spectrum around the centre frequency set for the receiver, and if the transmitted signal is within this band a tone can be seen.
+
+While the above mentioned steps allows one to use a browser and PYNQ as a terminal or semi GUI for the PS to transmit and receive, there is no method mentioned in the PYNQ documentation to upload information from say a file on the workstation (say a bin file containing the samples to be transmitted) to the PS; but this isn’t an issue in itself because PYNQ is interfaced with using Python.
+
+There are many ways to establish a connection but the one we use is through a TCP link. Essentially a server code is run on the workstation and its corresponding client code is run on the Jupyter notebook in the browser. More on this has been discussed in Lesson 2.
+
+## Setting up a TCP connection 
+
 #### Disclaimer
 
 The python program for this lesson is present in the "Client-Server Python Files" folder. The program in this folder does not represent the entire system. It is merely a portion of the system that encompasses the topics discussed in this lesson.
