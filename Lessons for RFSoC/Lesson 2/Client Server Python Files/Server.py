@@ -73,26 +73,11 @@ class Compute_instance(threading.Thread):
         print(f"Length of received data: {len(self.recved_msg)}")
         list_msg =pk.loads(self.recved_msg)
         self.message_socket2.close()
-        
         end = time.time()
-        print(f"Total time is to transfer from host: {end-start}seconds")
-        data_size = 1000
         
-        self.input_mem = allocate(shape=(data_size,1),dtype=np.int32)
-        self.output_mem = allocate(shape=(data_size,1),dtype=np.int32)
-        
-        self.input_mem = np.int32(np.real(list_msg[i]))
-        
-        ol.axi_dma_0.sendchannel.transfer(self.input_mem)
-        print("Data sent from PS to PL")
-        ol.axi_dma_0.recvchannel.transfer(self.output_mem)
-        print(f"Output {type(np.array(self.output_mem))}")
-        #f= open('reflected_samples.txt','wb')
-        print("Data received from PL to PS")
-        reflected_samples = self.output_mem#np.array(list())
-       
+        print(f"Total time is to transfer from host: {end-start}seconds")      
+        reflected_samples = self.recved_msg
         reflected_samples_byt = pk.dumps(reflected_samples)
-         
         self.send_msg(reflected_samples_byt,conn,True)
         print("Samples have been sent back to Host")
        
