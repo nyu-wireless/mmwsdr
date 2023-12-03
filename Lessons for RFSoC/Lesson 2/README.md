@@ -47,16 +47,17 @@ The flow goes as follows;
 2) Once connection is established the RFSoC immediately checks for availability of resources and creates a new thread, where a new TCP socket is opened, the port information for the same is sent back to the host.
 3) The Host receives the new port information, sends a request for the original socket connection to be closed, and requests for a connection with the new thread that was created.
 #### NOTE: Since the original socket connection is closed almost immediately, other users can access it to have themselves alloted a resource (if any available) while the first host is still communicating with the PS on a different thread.
-4) The Host then starts sending the samples to the PS (new thread) in frames.
+4) The Host then starts sending the samples to the PS (new thread) in frames, but as two separate messages. The first message includes information on the length of the actual samples that will be sent followed by the samples themselves
+5) The Server, having first received the length of the array of incoming samples, uses that information to invoke a receive method in the TCP protocol. It is to be noted that the TCP receive method doesn't always return the requested number of samples in one try. To mitigate this the receive function will have to be called in a looping manner to ensure delivery of all samples.
 #### NOTE: The PS handles all communication and synchronization with the PL, and the PL itself does the major processing on the samples.
-6) The PS then writes the frame of samples into the PS DRAM and sends it to the PL through the AXI-DMA streaming.
+6) In the final program the PS would then writes the frame of samples into the PS DRAM and sends it to the PL through the AXI-DMA streaming.
 7) The PL then processes the samples (More on this in Lesson 3) and sends the data back to the PS DRAM through the AXI-DMA.
-8) The Host, which after sending the samples is waiting , now gets back the processed samples and writes it to an output file. Post this is sends the next frame of data and the whole process repeats from step 3.
-9) Once the end of the file is reached, the host sends an "eof" message through the socket link to the PS, indicating that the socket connection can be severed and that the thread can be released.
+8) But since this lesson deals with only the communication between the host and the PS, the above two steps are not part of the code that is included with this lesson. The later lessons and final code would include this in great detail.
+9) The Host, which after sending the samples is waiting , now gets back the processed samples and writes it to an output file thus completing the loopback setup.
 
-The below block diagram explains the same system in a figure format
-![](Images/BlockDiagram.png)
+The below block diagram briefly explains the same system in a figure format
 
+![](Images/BlockDiagramv2.png)
 
 
 #### Please note:
