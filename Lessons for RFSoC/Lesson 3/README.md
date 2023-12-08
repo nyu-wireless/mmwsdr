@@ -49,6 +49,15 @@ sudo ./install_drivers
 * On the next screen, choose an installation location with enough space.
 * On the next screen, click Install and wait a while.
 
+* If installation hangs at generating installed device list:
+'''
+sudo apt update
+sudo apt upgrade
+sudo apt install libncurses5
+sudo apt install libtinfo5
+sudo apt install libncurses5-dev libncursesw5-dev
+'''
+
 ## Opening the Vivado 
 Once the software is installed it can be accessed with normal user privileges as follows:
 ```
