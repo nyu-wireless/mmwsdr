@@ -121,4 +121,4 @@ cd /tools/Xilinx/.xinstall
 * Solve problem 'ERROR: [Board 49-71] The board_part definition was not found for xilinx.com:rfsoc2x2:....'
 * Download the /rfsoc2x2_board_files/rfsoc2x2/ from [site](https://github.com/Xilinx/XilinxBoardStore/tree/2020.1/boards/Xilinx/rfsoc2x2/1.1)
 * Place this board files in /tools/Xilinx/Vivado/rfsoc2x2_board_files/rfsoc2x2/
-* Add command : set_param board.repoPaths {/tools/Xilinx/Vivado/rfsoc2x2_board_files/rfsoc2x2/1.1} into $HOME/.Xilinx/Vivado/Vivado_init.tcl (If you don't find the file in the dir, create a new one)
+* Add command : set_param board.repoPaths {/tools/Xilinx/Vivado/rfsoc2x2_board_files/rfsoc2x2} into $HOME/.Xilinx/Vivado/Vivado_init.tcl (If you don't find the file in the dir, create a new one)
