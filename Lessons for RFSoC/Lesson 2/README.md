@@ -1,21 +1,22 @@
 # Lesson 2:
 
-## Setting up connection to RFSoC to open Jupyter notebook on browser
-As mentioned in Lesson 0.1 the RFSoC contains 2 key processing elements, i.e a Processing System (PS,which has an operating system) and Programmable Logic (PL,which has an FPGA Image and some bitstream file in it). This system is connected to the workstation that runs Linux. We use said workstation system to connect to and control the board.
+## Setting up a connection to the RFSoC via a Jupyter notebook on the browser
+As mentioned in Lesson 0.1, the RFSoC contains 2 key processing elements, i.e, a Processing System (PS), which runs the operating system, and a Programmable Logic (PL), which contains an FPGA Image and some bitstream file. This system is connected to the workstation that runs Linux. We use said workstation system to connect to and control the board.
 
-Usually the flow of data is as follows:
+The data flow is as follows:
 
 Processing System ↔ Progammable Logic ↔ RF Front End
-Where, data originates from the Processing System for the Transmitter Configuration and as for the Receiver Configuration it’s the reverse where data origination is from the RF Front End.
+
+The data originates in the Processing System for the Transmitter Configuration. The data originates in the RF front-end for the Receiver Configuration.
 The following section explains the method to connect to the PS and program on the same.
 
 ### Connecting to the board
 
-Once the boot sequence is finished, the board can be accessed with a browser. On the URL bar type
+Once the boot sequence is finished, the board can be accessed via a browser. To do so, on the URL bar, type:
 
 https:192.168.3.1:9090/lab
 
-This is the default IP Address of a 2x2 board. The /lab part gives us access to the entire Jupyter lab instead of just the notebook, thus providing extra features such as a terminal.
+This is the default IP Address of our 2x2 board. The /lab part gives us access to the entire Jupyter lab instead of just the notebook, thus providing extra features such as a terminal.
 
 Once the URL is entered Jupyter lab opens with certain getting started files and example files. These files contain PYNQ examples such as Spectrum Analyser where the user can transmit a tone at a certain frequency from the 2x2 board and receive a certain band on the same board 2x2. The received and sampled signals are processed to give a spectrum around the centre frequency set for the receiver, and if the transmitted signal is within this band a tone can be seen.
 
