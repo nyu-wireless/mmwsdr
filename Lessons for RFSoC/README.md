@@ -1,7 +1,9 @@
 ### Structure of the course
 
-- Lesson 1: Plugging and setting up the FPGA Board
+- Lesson 1: Plugging and setting up the RFSoC
 - Lesson 2: Setting up a TCP connection between the host computer (Client) and RFSoC (Server)
+- Lesson 3: Installing VIVADO
+- Lesson 4: Basic Vivado and Pynq tutorials
 
   
 ### Working with the RFSoC 2x2 remotely
