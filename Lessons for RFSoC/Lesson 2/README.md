@@ -17,9 +17,7 @@ Once the boot sequence is finished, the board can be accessed via a browser. To 
 [https:192.168.3.1:9090/lab
 ](http://192.168.3.1/lab)
 
-The password is xilinx. 
-
-Once the URL is entered Jupyter lab opens with certain getting started files and example files. These files contain PYNQ examples such as Spectrum Analyser where the user can transmit a tone at a certain frequency from the 2x2 board and receive a certain band on the same board 2x2. The received and sampled signals are processed to give a spectrum around the centre frequency set for the receiver, and if the transmitted signal is within this band a tone can be seen.
+The password is xilinx. Jupyter lab offers a set of resources to getting started. For example, the Spectrum Analyser allows to transmit and receive a tone at a certain frequency. The received and sampled signals are processed to give a spectrum around the centre frequency set for the receiver, and if the transmitted signal is within this band a tone can be seen.
 
 While the above mentioned steps allows one to use a browser and PYNQ as a terminal or semi GUI for the PS to transmit and receive, there is no method mentioned in the PYNQ documentation to upload information from say a file on the workstation (say a bin file containing the samples to be transmitted) to the PS; but this isn’t an issue in itself because PYNQ is interfaced with using Python.
 
