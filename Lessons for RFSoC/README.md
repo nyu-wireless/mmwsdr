@@ -1,7 +1,7 @@
 ### Structure of the course
 
 - Lesson 1: Plugging and setting up the FPGA Board
-- Lesson 2:
+- Lesson 2: Setting up a TCP connection between the host computer (Client) and RFSoC (Server)
 
   
 ### Working with the RFSoC 2x2 remotely
