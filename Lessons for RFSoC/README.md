@@ -1,7 +1,9 @@
 ### Structure of the course
 
-- Lesson 1:  
+- Lesson 1: Plugging and setting up the FPGA Board
+- Lesson 2:
 
+  
 ### Working with the RFSoC 2x2 remotely
 
 The RFSoC 2x2 board is connected to a Workstation in Prof. Rangan's Wireless Lab at NYU. This machine can be accessed remotely using tools such as RealVCN or Screen Sharing (for MAC users) using the following credentials:
