@@ -14,9 +14,10 @@ The following section explains the method to connect to the PS and program on th
 
 Once the boot sequence is finished, the board can be accessed via a browser. To do so, on the URL bar, type:
 
-https:192.168.3.1:9090/lab
+[https:192.168.3.1:9090/lab
+](http://192.168.3.1/lab)
 
-This is the default IP Address of our 2x2 board. The /lab part gives us access to the entire Jupyter lab instead of just the notebook, thus providing extra features such as a terminal.
+The password is xilinx. 
 
 Once the URL is entered Jupyter lab opens with certain getting started files and example files. These files contain PYNQ examples such as Spectrum Analyser where the user can transmit a tone at a certain frequency from the 2x2 board and receive a certain band on the same board 2x2. The received and sampled signals are processed to give a spectrum around the centre frequency set for the receiver, and if the transmitted signal is within this band a tone can be seen.
 
