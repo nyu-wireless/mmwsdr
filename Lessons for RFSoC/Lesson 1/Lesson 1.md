@@ -1,4 +1,4 @@
-# Lesson 1: Plugging and setting the FPGA Board
+# Lesson 1: Plugging and setting up the FPGA Board
 ## Loading Image onto RFSoC 2x2 board
 
 Steps to follow to load a PYNQ image
