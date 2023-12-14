@@ -16,7 +16,7 @@ RealVNC Password : nyu@1234
 
 Login Password   : nyu@1234
 
-Remember to enable internet connectivity on the board by connecting it to the host computer over Ethernet, and by selecting "Shared to other computers" under the IPv4 method in the network setting of the selected interface. If you type 
+Remember to enable internet connectivity on the board by connecting it to the host computer over Ethernet, and by selecting "Shared to other computers" under the IPv4 method in the network setting of the selected interface. After doing that, if you type 
 
 ```
 nmap -sn 10.42.0.0/24 | grep report
