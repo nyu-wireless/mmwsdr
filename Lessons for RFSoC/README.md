@@ -1,6 +1,6 @@
 ### Structure of the course
 
-- Lesson 1: Plugging and setting up the RFSoC
+- Lesson 1: Loading an image and setting up the RFSoC
 - Lesson 2: Setting up a TCP connection between the host computer (Client) and RFSoC (Server)
 - Lesson 3: Installing VIVADO
 - Lesson 4: Basic Vivado and Pynq tutorials
