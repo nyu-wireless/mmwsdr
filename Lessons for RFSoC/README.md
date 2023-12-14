@@ -18,3 +18,5 @@ Login Password   : nyu@1234
 
 ### Other Educational material 
 In this [link]([https://xilinx.github.io/RFSoC2x2-PYNQ/educational_resources.html]), we can find a lot more educational material to support the Zynq RFSoC and the RFSoC2x2. This has been developed by the University of Strathclyde in partnership with Xilinx. We recommend to follow these [RFSoC notebooks]([(https://github.com/strath-sdr/rfsoc_notebooks)https://github.com/strath-sdr/rfsoc_notebooks]) are 
+
+[](url)
