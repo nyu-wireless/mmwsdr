@@ -28,22 +28,61 @@ on the host computer, you should see two addresses: 10.42.0.1 (the host computer
 
 Now, follow these steps: 
 
-1) Enable IP forwarding
-```
-sudo nano /etc/sysctl.conf
-```
-
 
 1) Enable IP forwarding
 ```
 sudo nano /etc/sysctl.conf
 ```
-Uncomment or add this line: 
+Then, uncomment or add this line: 
 ```
 net.ipv4.ip_forward=1
 ```
+Save and exit the editor, then apply the changes: 
+```
+sudo sysctl -p
+```
 
+2) Configure DHCP
+```
+sudo apt-get install isc-dhcp-server
+```
+Edit the DHCP server configuration:
+```
+sudo nano /etc/dhcp/dhcpd.conf
+```
+Add the following lines: 
+```
+subnet 10.42.0.0 netmask 255.255.255.0 {
+  range 10.42.0.2 10.42.0.100;
+  option routers 10.42.0.1;
+  option domain-name-servers 8.8.8.8, 8.8.4.4;
+}
+```
+Save, exit, and start the DHCP server: 
+```
+sudo service isc-dhcp-server start
+```
 
+3) Configure Network Address Translation (NAT)
+```
+sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+```
+Save the iptables rules
+```
+sudo sh -c "iptables-save > /etc/iptables.rules"
+```
+Edit network interface 
+```
+sudo nano /etc/network/interfaces
+```
+Add the following line at the end 
+```
+pre-up iptables-restore < /etc/iptables.rules
+```
+Reboot: 
+```
+sudo reboot 
+```
 
 ### Other Educational material 
 [Here](https://xilinx.github.io/RFSoC2x2-PYNQ/educational_resources.html) we can find a lot more educational material to support the Zynq RFSoC and the RFSoC2x2. This content has been developed by the University of Strathclyde in partnership with Xilinx. We recommend to follow these [RFSoC introductory notebooks](https://github.com/strath-sdr/rfsoc_notebooks). 
