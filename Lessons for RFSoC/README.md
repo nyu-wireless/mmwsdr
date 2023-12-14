@@ -16,7 +16,13 @@ RealVNC Password : nyu@1234
 
 Login Password   : nyu@1234
 
-Remember to enable internet connectivity on the board by connecting it to the host computer over Ethernet, and by selecting "Shared to other computers" under the IPv4 method in the network setting of the selected interface.  
+Remember to enable internet connectivity on the board by connecting it to the host computer over Ethernet, and by selecting "Shared to other computers" under the IPv4 method in the network setting of the selected interface. If you type 
+
+```
+nmap -sn 10.42.0.0/24 | grep report
+```
+
+on the host computer, you should see two addresses: 10.42.0.1 (the host computer), and 10.42.0.x (the RFSoC).  
 
 ### Other Educational material 
 [Here](https://xilinx.github.io/RFSoC2x2-PYNQ/educational_resources.html) we can find a lot more educational material to support the Zynq RFSoC and the RFSoC2x2. This content has been developed by the University of Strathclyde in partnership with Xilinx. We recommend to follow these [RFSoC introductory notebooks](https://github.com/strath-sdr/rfsoc_notebooks). 
