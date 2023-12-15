@@ -6,7 +6,7 @@
 - Lesson 4: Basic Vivado and Pynq tutorials
 
 ### Other Educational material 
-[Here](https://xilinx.github.io/RFSoC2x2-PYNQ/educational_resources.html) we can find a lot more educational material to support the Zynq RFSoC and the RFSoC2x2. This content has been developed by the University of Strathclyde in partnership with Xilinx. We recommend to follow these [RFSoC introductory notebooks](https://github.com/strath-sdr/rfsoc_notebooks). 
+[Here](https://xilinx.github.io/RFSoC2x2-PYNQ/educational_resources.html) we can find a lot more educational material to support the Zynq RFSoC and the RFSoC2x2. This content has been developed by the University of Strathclyde in partnership with Xilinx. We recommend to follow these [RFSoC introductory notebooks](https://github.com/strath-sdr/rfsoc_notebooks). I encourage you to begin this class by covering these noetbooks first. [Lesson 1](http://192.168.3.1:9090/lab/workspaces/auto-a/tree/rfsoc-notebooks/01_rfsoc_architecture_overview.ipynb) is particularly insightful to get you started. 
 
 
 ### Working with the RFSoC 2x2 remotely
