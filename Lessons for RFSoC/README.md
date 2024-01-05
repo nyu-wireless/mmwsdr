@@ -6,7 +6,7 @@
 - Lesson 4: Basic Vivado and Pynq tutorials
 
 ### Other Educational material 
-[Here](https://xilinx.github.io/RFSoC2x2-PYNQ/educational_resources.html) we can find a lot more educational material to support the Zynq RFSoC and the RFSoC2x2. This content has been developed by the University of Strathclyde in partnership with Xilinx. We recommend to follow these [RFSoC introductory notebooks](https://github.com/strath-sdr/rfsoc_notebooks). I encourage you to begin this class by covering these notebooks first. [Lesson 1](http://192.168.3.1:9090/lab/workspaces/auto-a/tree/rfsoc-notebooks/01_rfsoc_architecture_overview.ipynb) is particularly insightful to get you started. 
+[Here](https://xilinx.github.io/RFSoC2x2-PYNQ/educational_resources.html) you can find a lot more educational material to support the Zynq RFSoC and the RFSoC2x2. This content has been developed by the University of Strathclyde in partnership with Xilinx. We recommend following these [RFSoC introductory notebooks](https://github.com/strath-sdr/rfsoc_notebooks). We encourage you to begin this class by covering these notebooks first. [Lesson 1](http://192.168.3.1:9090/lab/workspaces/auto-a/tree/rfsoc-notebooks/01_rfsoc_architecture_overview.ipynb) is particularly insightful to get you started. 
 
 
 ### Working with the RFSoC 2x2 remotely
@@ -22,7 +22,8 @@ Login Password   : nyu@1234
 
 ### Enable internet connectivity on the RFSoC 2x2
 
-Remember to enable internet connectivity on the board by connecting it to the host computer over Ethernet, and by selecting "Shared to other computers" under the IPv4 method in the network setting of the selected interface. After doing that, if you type 
+Remember to enable internet connectivity on the board. Ideally, you use a USB-Ethernet adapter on the host machine. Otherwise, if you connect the board directly to the host computer through the Ethernet port, you should follow these steps. 
+First of all, select "Shared to other computers" under the IPv4 method in the network setting of the selected interface. After doing that, if you type 
 
 ```
 nmap -sn 10.42.0.0/24 | grep report
