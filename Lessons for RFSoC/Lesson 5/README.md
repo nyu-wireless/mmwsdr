@@ -15,11 +15,11 @@
  3) The upcoming section is one where the testbench files can be added or created. A testbench file is a simulation file used to validate the source code, greatly helping in debugging. Click on **Next**
  4) Post this is the final section of the pop-up where the solution name, clock period and part selection are to be entered. Depending on the requirement the clock can be set to a specific value. This can be changed later as well. The other important parameter to set is the part(or in other words the board that the IP will be run on). The HLS code is synthesized based on the part that is selected here. To select the part click on "**... -->Select Boards-->Select RFSoC 2x2**". Click on **Next**.
 <p align="center">
-<img src="Picture1.png" alt="Alt Text" width="700" height="400">
+<img src="Picture1.png" alt="Alt Text">
 </p>
 
 <p align="center">
-<img src="Picture2.png" alt="Alt Text" width="700" height="400">
+<img src="Picture2.png" alt="Alt Text" >
 </p>
  5) Once the above steps are completed the finish button can be clicked and the project is now ready.
 
@@ -27,13 +27,13 @@
 Once the project is ready one can start editing the source files. It is important to note that there can be multiple source files under a project but the main file that will be run on the FPGA when the specific IP is called is the top level function. This can be specified by going to "**Project(in the Menu bar) --> Project Settings --> Synthesis --> Browse --> Browse to the bottom and select the name of the source file that needs to be the top function**".
 
 <p align="center">
-<img src="Picture4.png" alt="Alt Text" width="700" height="400">
+<img src="Picture4.png" alt="Alt Text" >
 </p>
 
 After the code is written the C synthesis can be performed (conversion of HLS code to low level hardware description language) by clicking on the Play button on the tools bar. 
 
 <p align="center">
-<img src="Picture3.png" alt="Alt Text" width="700" height="400">
+<img src="Picture3.png" alt="Alt Text" >
 </p>
 
 Once the synthesis has finished successfully one can export the RTL onto a file;  This file is later used in the Vivado design to use the IP programmed using C++. One can export the RTL file by going to "**Solution --> Export RTL**". Fill in the details of where the file needs to be saved and what its displahy name is (This is the name that the IP has on Vivado later). This file is later used in the Vivado design to use the IP programmed using C++.
