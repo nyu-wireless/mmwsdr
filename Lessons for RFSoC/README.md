@@ -4,7 +4,8 @@
 - Lesson 2: Setting up a TCP connection between the host computer (Client) and RFSoC (Server)
 - Lesson 3: Installing VIVADO
 - Lesson 4: Basic Vivado and Pynq tutorials
-
+- Lesson 5: Writing logic in Vitis
+  
 ### Other Educational material 
 [Here](https://xilinx.github.io/RFSoC2x2-PYNQ/educational_resources.html) you can find a lot more educational material to support the Zynq RFSoC and the RFSoC2x2. This content has been developed by the University of Strathclyde in partnership with Xilinx. We recommend following these [RFSoC introductory notebooks](https://github.com/strath-sdr/rfsoc_notebooks). We encourage you to begin this class by covering these notebooks first. [Lesson 1](http://192.168.3.1:9090/lab/workspaces/auto-a/tree/rfsoc-notebooks/01_rfsoc_architecture_overview.ipynb) is particularly insightful to get you started. 
 
@@ -15,9 +16,8 @@ The RFSoC 2x2 board is connected to a Workstation in Prof. Rangan's Wireless Lab
  
 IP Address       : 172.24.113.58
 
-RealVNC Password : nyu@1234
-
-Login Password   : nyu@1234
+RealVNC Password : ask Prof. Rangan
+Login Password   : ask Prof. Rangan
 
 
 ### Enable internet connectivity on the RFSoC 2x2
