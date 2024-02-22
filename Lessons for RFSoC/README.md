@@ -17,6 +17,7 @@ The RFSoC 2x2 board is connected to a Workstation in Prof. Rangan's Wireless Lab
 IP Address       : 172.24.113.58
 
 RealVNC Password : ask Prof. Rangan
+
 Login Password   : ask Prof. Rangan
 
 
