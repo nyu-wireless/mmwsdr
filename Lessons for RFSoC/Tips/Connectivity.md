@@ -1,4 +1,6 @@
-First of all, select "Shared to other computers" under the IPv4 method in the network setting of the selected interface. After doing that, if you type 
+In order to enable network connectivity on the RFSoC through an Ethernet cable connected to your host computer, you should first select "Shared to other computers" under the IPv4 method in the network setting of the selected interface. 
+
+After doing that, if you type 
 
 ```
 nmap -sn 10.42.0.0/24 | grep report
