@@ -23,6 +23,9 @@
 </p>
  5) Once the above steps are completed the finish button can be clicked and the project is now ready.
 
+## On Writing the HLS code
+An example to write HLS code is given in these links [Part 1](https://discuss.pynq.io/t/tutorial-using-a-hls-stream-ip-with-dma-part-1-hls-design/3344), [Part 2](https://discuss.pynq.io/t/tutorial-using-a-hls-stream-ip-with-dma-tutorial-part-2-vivado-design/3345) and [Part 3](https://discuss.pynq.io/t/tutorial-using-a-hls-stream-ip-with-dma-tutorial-part-2-vivado-design/3345). The source code for the same has been attached in this lesson's directory for reference.
+
 ## Synthesis and RTL Export
 Once the project is ready one can start editing the source files. It is important to note that there can be multiple source files under a project but the main file that will be run on the FPGA when the specific IP is called is the top level function. This can be specified by going to "**Project(in the Menu bar) --> Project Settings --> Synthesis --> Browse --> Browse to the bottom and select the name of the source file that needs to be the top function**".
 
