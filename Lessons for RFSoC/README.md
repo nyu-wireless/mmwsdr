@@ -10,7 +10,7 @@
 [Here](https://xilinx.github.io/RFSoC2x2-PYNQ/educational_resources.html) you can find a lot more educational material to support the Zynq RFSoC and the RFSoC2x2. This content has been developed by the University of Strathclyde in partnership with Xilinx. We recommend following these [RFSoC introductory notebooks](https://github.com/strath-sdr/rfsoc_notebooks). We encourage you to begin this class by covering these notebooks first. [Lesson 1](http://192.168.3.1:9090/lab/workspaces/auto-a/tree/rfsoc-notebooks/01_rfsoc_architecture_overview.ipynb) is particularly insightful to get you started. 
 
 
-### Working with the RFSoC 2x2 remotely
+### Working with the RFSoC remotely
 
 The RFSoC 2x2 board is connected to a Workstation in Prof. Rangan's Wireless Lab at NYU. This machine can be accessed remotely using tools such as RealVCN or Screen Sharing (for MAC users) using the following credentials:
  
@@ -21,7 +21,7 @@ RealVNC Password : ask Prof. Rangan
 Login Password   : ask Prof. Rangan
 
 
-### Enable internet connectivity on the RFSoC 2x2
+### Enable internet connectivity 
 
 Enable network connectivity on the RFSoC through an Ethernet cable connected to your host computer
 
