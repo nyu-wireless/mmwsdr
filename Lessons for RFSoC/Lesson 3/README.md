@@ -122,3 +122,7 @@ cd /tools/Xilinx/.xinstall
 * Download the /rfsoc2x2_board_files/rfsoc2x2/ from [site](https://github.com/Xilinx/XilinxBoardStore/tree/2020.1/boards/Xilinx/rfsoc2x2/1.1)
 * Place this board files in /tools/Xilinx/Vivado/rfsoc2x2_board_files/rfsoc2x2/
 * Add command : set_param board.repoPaths {/tools/Xilinx/Vivado/rfsoc2x2_board_files/rfsoc2x2} into $HOME/.Xilinx/Vivado/Vivado_init.tcl (If you don't find the file in the dir, create a new one)
+
+## RFSoC 4x2 Board file missing issue:
+* Follow instructions: [Pynq RFSoC 4x2](https://discuss.pynq.io/t/missing-rfsoc-4x2-board-files-in-board-store/5281/2)
+  
