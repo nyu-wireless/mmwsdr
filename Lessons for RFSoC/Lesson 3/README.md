@@ -91,7 +91,7 @@ The license file will be emailed to your NYU email address - or another email us
 
 **Vivado License Manager**
 
-For making any changes to software make sure to open Vivado with root privileges as stated above. 
+For making any changes to the software make sure to open Vivado with root privileges as stated above. 
 
 * Navigate to the **Help** section in the toolbar on the top and then click on **Manage License**.
 * Now download the Xlinix license file from the email onto your local machine.
