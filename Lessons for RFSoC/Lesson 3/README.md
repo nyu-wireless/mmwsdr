@@ -125,4 +125,9 @@ cd /tools/Xilinx/.xinstall
 
 ## RFSoC 4x2 Board file missing issue:
 * Follow instructions: [Pynq RFSoC 4x2](https://discuss.pynq.io/t/missing-rfsoc-4x2-board-files-in-board-store/5281/2)
+* Once you've downloaded the board files from RealDigital, copy the rfsoc4x2/1.0 folder here:
+  ```
+  /tools/Xilinx/Vivado/2022.1/data/boards/board_files/
+  ```
+
   
