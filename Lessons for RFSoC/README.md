@@ -25,7 +25,8 @@ Login Password   : ask Prof. Rangan
 
 Enable network connectivity on the RFSoC through an Ethernet cable connected to your host computer
 
-On RFSoC board:
+On the RFSoC board (open a terminal at http://192.168.3.1:9090/lab to get root access):
+
 ```
 sudo route add default gw 192.168.2.1 dev eth0
 sudo ip route add 0.0.0.0/0 dev eth0
