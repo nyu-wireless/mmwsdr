@@ -40,7 +40,7 @@ On the workstation (note that, in this example, _enp2s0_ is the interface connec
 sudo ufw disable
 sudo sysctl -w net.ipv4.ip_forward=1
 sudo ip route add 0.0.0.0/0 dev enp2s0
-sudo iptables -t nat -A POSTROUTING -o enp02s0 -s 192.168.2.0/24 -j MASQUERADE
+sudo iptables -t nat -A POSTROUTING -o enp2s0 -s 192.168.2.0/24 -j MASQUERADE
 sudo systemctl restart NetworkManager
 sudo ip address add 192.168.2.1/24 dev enp0s31f6
 ```
