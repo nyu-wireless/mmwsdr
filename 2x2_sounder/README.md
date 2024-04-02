@@ -127,8 +127,9 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
 ### Run the testbed 
 
 1. Start the TX
-   1. Server
-   2. Script 
+   1. Connect to http://192.168.3.1:9090/lab/tree/mmwsdr/
+   2. Launch TxDebug_4x2.ipynb
+   3. Launch tx.py from terminal  
 2. Start the RX
    1. Server
    2. Script
