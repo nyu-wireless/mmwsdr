@@ -128,8 +128,18 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
 
 1. Start the TX
    1. Connect to http://192.168.3.1:9090/lab/tree/mmwsdr/
-   2. Launch TxDebug_4x2.ipynb
+   2. Run ifconfig from a terminal and make sure that eth0 (or eth0:1) is 192.168.2.99
+      1. If that is not the case, bring the interface up with the following command:
+         ```
+         sudo ifconfig eth0 192.168.2.99 netmask 255.255.255.0 up
+         ```
+   4. Launch TxDebug_4x2.ipynb
 2. Start the RX
    1. Open VS and launch SounderRxandPlot.py
    2. Connect to http://192.168.3.1:9090/lab/tree/mmwsdr/
-   3. Launch rx_plot-mm.ipynb
+   3. Run ifconfig from a terminal and make sure that eth0 (or eth0:1) is 192.168.4.99
+      1. If that is not the case, bring the interface up with the following command:
+         ```
+         sudo ifconfig eth0 192.168.4.99 netmask 255.255.255.0 up
+         ```
+   4. Launch rx_plot-mm.ipynb
