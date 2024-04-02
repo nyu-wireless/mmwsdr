@@ -126,7 +126,6 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
 
 ### Run the testbed 
 
- Markup : * Bullet list
-              * Nested bullet
-                  * Sub-nested bullet etc
-          * Bullet list item 2
+* Bullet list
+ * Nested bullet
+  * Sub-nested bullet etc
