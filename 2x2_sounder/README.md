@@ -127,7 +127,9 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
 ### Run the testbed 
 
 1. Start the TX
-  1. Server
-  2. Script 
-3. 
-4. 
+   1. Server
+   2. Script 
+2. Start the RX
+   1. Server
+   2. Script
+   3. Script 2  
