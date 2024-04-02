@@ -12,6 +12,8 @@ Instructions to build, set up and run the 60 GHz Channel Sounder developed by No
 
 [3. Run](#3-run-the-testbed)
 
+[4. RFSoC 4x2](#4-4x2)
+
 ## 1. Build the testbed
 
 Carefully follow each step described in the [HW setup](https://github.com/nyu-wireless/mmwsdr/blob/main/2x2_sounder/HW_setup.pdf) document. You will learn how to connect the Sivers arrays (TX and RX) to the RFSoC 2x2 boards through the Broadband balun model Merkei BAL0006. 
@@ -117,4 +119,6 @@ The rx.py script will save the received IQ samples in .txt and .csv formats. Tra
 scp xilinx@10.1.1.30:/home/xilinx/hest.csv /home/ubuntu/Downloads/
 scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
 ```
+
+## 4. RFSoC 4x2 <a name="4x2"></a>
 
