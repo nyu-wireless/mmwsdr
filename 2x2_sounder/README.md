@@ -126,6 +126,8 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
 
 ### Run the testbed 
 
-* Bullet list
- * Nested bullet
-  * Sub-nested bullet etc
+1. Start the TX
+ 1. Server
+ 2. Script 
+3. 
+4. 
