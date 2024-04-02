@@ -129,8 +129,7 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
 1. Start the TX
    1. Connect to http://192.168.3.1:9090/lab/tree/mmwsdr/
    2. Launch TxDebug_4x2.ipynb
-   3. Launch tx.py from terminal  
 2. Start the RX
-   1. Server
-   2. Script
-   3. Script 2  
+   1. Open VS and launch SounderRxandPlot.py
+   2. Connect to http://192.168.3.1:9090/lab/tree/mmwsdr/
+   3. Launch rx_plot-mm.ipynb
