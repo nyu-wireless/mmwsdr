@@ -12,7 +12,7 @@ Instructions to build, set up and run the 60 GHz Channel Sounder developed by No
 
 [3. Run](#3-run-the-testbed)
 
-[4. RFSoC 4x2](#4-4x2)
+[4. RFSoC 4x2](#4x2)
 
 ## 1. Build the testbed
 
