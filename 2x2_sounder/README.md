@@ -144,6 +144,23 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
                 ```
                 sudo ifconfig eth0 192.168.4.99 netmask 255.255.255.0 up
                 ```
-      2. OPTION 2: 
+      2. OPTION 2: The 4x2 board is connected to the host computer via Wi-Fi. The IP address used in this case is 10.42.0.1.
+          1. Creation of a Wi-Fi AP (on the host computer - in this example the wi-fi interface used is named _wls5_)
+             ```
+             sudo ip link set wls5 down
+             sudo nmcli device wifi hotspot con-name 60ghzsounder ssid 60ghzsounder password NYU123___
+             sudo ip link set wls5 up
+             ```
+          2. Connect the 4x2 board to the _60ghzsounder_ local network
+             ```
+             wpa_passphrase 60ghzsounder NYU123___ | sudo tee /e`tc/wpa_supplicant.conf
+             sudo wpa_supplicant -B -i wls5 -c /etc/wpa_supplicant.conf
+             sudo dhclient wls5
+             ```
+          3. Run some tests to make sure the 4x2 board can reach the server that is running on the host computer
+             ```
+             ping 8.8.8.8
+             ping 10.42.0.1             
+             ```
    4. From that same terminal, initate the server by launching server_4x2.py
    5. Launch rx_plot-mm.ipynb
