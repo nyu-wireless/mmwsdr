@@ -137,12 +137,12 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
 2. Start the RX
    1. Open VS and launch SounderRxandPlot.py
    2. Connect to http://192.168.3.1:9090/lab/tree/mmwsdr/
-   3a. OPTION 1: 4x2 board connected to the host computer that runs the server through an Ethernet cable that is connected to a switch. The IP address used in this case is 192.168.4.1.
+   3.1. OPTION 1: 4x2 board connected to the host computer that runs the server through an Ethernet cable that is connected to a switch. The IP address used in this case is 192.168.4.1.
        1. Run ifconfig from a terminal and make sure that eth0 (or eth0:1) is 192.168.4.99
           1. If that is not the case, bring the interface up with the following command:
              ```
              sudo ifconfig eth0 192.168.4.99 netmask 255.255.255.0 up
              ```
-   3b. OPTION 2: 
+   3.2. OPTION 2: 
    4. From that same terminal, initate the server by launching server_4x2.py
    5. Launch rx_plot-mm.ipynb
