@@ -161,11 +161,12 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
           3. Run some tests to make sure the 4x2 board can reach the server that is running on the host computer
              ```
              ping 8.8.8.8
-             ping 10.42.0.1             
+             ping 10.42.0.1
              ```
-          4. Make sure that both the _rx_plot-mm.ipynb_ script on the 4x2, and the _SounderRxandPlot.py_ script on the host machine               ```
+          4. Make sure that both the _rx_plot-mm.ipynb_ script on the 4x2, and the _SounderRxandPlot.py_ script on the host machine  
+             ```
              data_rx.bind(("10.42.0.1",9000))
-             data_trx.connect(('10.42.0.1',trx_port))
+             data_trx.connect(('10.42.0.1',trx_port))             
              ``` 
    4. From that same terminal, initate the server by launching server_4x2.py
    5. Launch rx_plot-mm.ipynb
