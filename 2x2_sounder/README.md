@@ -168,5 +168,9 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
              data_rx.bind(("10.42.0.1",9000))
              data_trx.connect(('10.42.0.1',trx_port))             
              ``` 
-   4. From that same terminal, initate the server by launching server_4x2.py
-   5. Launch rx_plot-mm.ipynb
+   4. Now, from a terminal on the 4x2 lab page, launch the server:
+      ```
+      python server_4x2.py
+      ```
+   5. From the host computer launch the RX processing python script (e.g., _SounderRxandPlot.py_)
+   6. Finally, launch a Jupyter notebook (e.g., _rx_plot-mm.ipynb_) from the 4x2 board 
