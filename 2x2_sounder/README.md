@@ -151,11 +151,11 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
              sudo nmcli device wifi hotspot con-name 60ghzsounder ssid 60ghzsounder password NYU123___
              sudo ip link set wls5 up
              ```
-          2. Connect the 4x2 board to the _60ghzsounder_ local network
+          2. Connect the 4x2 board to the _60ghzsounder_ local network via _wlan0_ in this example
              ```
              sudo ifconfig eth0 down
              wpa_passphrase 60ghzsounder NYU123___ | sudo tee /e`tc/wpa_supplicant.conf
-             sudo wpa_supplicant -B -i wls5 -c /etc/wpa_supplicant.conf
+             sudo wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant.conf
              sudo dhclient wls5
              ```
           3. Run some tests to make sure the 4x2 board can reach the server that is running on the host computer
