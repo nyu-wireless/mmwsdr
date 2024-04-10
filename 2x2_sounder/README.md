@@ -154,7 +154,7 @@ scp xilinx@10.1.1.30:/home/xilinx/hest.txt /home/ubuntu/Downloads/
           2. Connect the 4x2 board to the _60ghzsounder_ local network via _wlan0_ in this example
              ```
              sudo ifconfig eth0 down
-             wpa_passphrase 60ghzsounder NYU123___ | sudo tee /e`tc/wpa_supplicant.conf
+             wpa_passphrase 60ghzsounder NYU123___ | sudo tee /etc/wpa_supplicant.conf
              sudo wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant.conf
              sudo dhclient wlan0
              ```
