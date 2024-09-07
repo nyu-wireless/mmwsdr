@@ -49,7 +49,7 @@ sudo ip addr add 192.168.137.2/24 dev eth0
 sudo ip route add default via 192.168.137.1 dev eth0
 ```
 
-Enable network connectivity on the RFSoC through an Ethernet cable connected to your host computer.
+VERSION 2
 
 On the RFSoC board (open a terminal at http://192.168.3.1:9090/lab to get root access):
 
