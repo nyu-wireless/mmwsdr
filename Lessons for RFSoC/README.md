@@ -23,7 +23,33 @@ Login Password   : ask Prof. Rangan
 
 ### Enable internet connectivity 
 
-Enable network connectivity on the RFSoC through an Ethernet cable connected to your host computer
+VERSION 1
+
+_On the host computer_ 
+
+1. Set Up IP Forwarding
+```
+echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+sudo sysctl -p
+```
+2. Configure NAT with iptables
+```
+sudo iptables -t nat -A POSTROUTING -o wlp9s0 -j MASQUERADE
+sudo iptables -A FORWARD -i enxa0cec801a9dc -o wlp9s0 -j ACCEPT
+sudo iptables -A FORWARD -i wlp9s0 -o enxa0cec801a9dc -m state --state RELATED,ESTABLISHED -j ACCEPT
+```
+3. Assign a Static IP to the Ethernet Interface the board is connected to (e.g., eno1)
+```
+sudo ip addr add 192.168.137.1/24 dev eno1
+```
+
+_On the FPGA board_
+```
+sudo ip addr add 192.168.137.2/24 dev eth0
+sudo ip route add default via 192.168.137.1 dev eth0
+```
+
+Enable network connectivity on the RFSoC through an Ethernet cable connected to your host computer.
 
 On the RFSoC board (open a terminal at http://192.168.3.1:9090/lab to get root access):
 
