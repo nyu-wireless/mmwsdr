@@ -32,13 +32,13 @@ _On the host computer_
 echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
 sudo sysctl -p
 ```
-2. Configure NAT with iptables
+2. Configure NAT with iptables (in this example, wlp is the interface connected to internet, whereas eno1 is the interface connected to the FPGA board) 
 ```
-sudo iptables -t nat -A POSTROUTING -o wlp9s0 -j MASQUERADE
-sudo iptables -A FORWARD -i enxa0cec801a9dc -o wlp9s0 -j ACCEPT
-sudo iptables -A FORWARD -i wlp9s0 -o enxa0cec801a9dc -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -t nat -A POSTROUTING -o wlp -j MASQUERADE
+sudo iptables -A FORWARD -i eno1 -o wlp -j ACCEPT
+sudo iptables -A FORWARD -i wlp -o eno1 -m state --state RELATED,ESTABLISHED -j ACCEPT
 ```
-3. Assign a Static IP to the Ethernet Interface the board is connected to (e.g., eno1)
+3. Assign a Static IP to the Ethernet Interface 
 ```
 sudo ip addr add 192.168.137.1/24 dev eno1
 ```
